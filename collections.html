@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>藏品展示 - 嘉孚堂</title>
+    <meta name="description" content="嘉孚堂藏品展示，艺术品、古董文物、珠宝奢侈品等">
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="icon" type="image/x-icon" href="favicon.ico">
+    <link rel="apple-touch-icon" href="favicon.ico">
+</head>
+<body>
+    <!-- Header -->
+    <header class="header scrolled" id="header">
+        <div class="container header-inner">
+            <a href="index.html" class="logo">
+                <img src="images/logo.png" alt="嘉孚堂" class="logo-img">
+            </a>
+            <nav class="nav" id="nav">
+                <a href="index.html" class="nav-link">首页</a>
+                <a href="collections.html" class="nav-link active">藏品展示</a>
+                <a href="consignment.html" class="nav-link">征集流程</a>
+                <a href="news.html" class="nav-link">新闻动态</a>
+                <a href="about.html" class="nav-link">关于我们</a>
+            </nav>
+            <button class="hamburger" id="hamburger" aria-label="菜单">
+                <span></span>
+                <span></span>
+                <span></span>
+            </button>
+        </div>
+    </header>
+
+    <!-- Page Header -->
+    <section class="page-header">
+        <div class="container">
+            <h1>藏品展示</h1>
+            <p>精选艺术珍品，传承文化价值</p>
+        </div>
+    </section>
+
+    <!-- Filter Section -->
+    <section class="filter-section">
+        <div class="container">
+            <div class="filter-bar">
+                <div class="filter-tabs">
+                    <button class="filter-btn active" data-category="all">全部</button>
+                    <button class="filter-btn" data-category="art">艺术品</button>
+                    <button class="filter-btn" data-category="antique">古董文物</button>
+                    <button class="filter-btn" data-category="jewelry">珠宝奢侈品</button>
+                    <button class="filter-btn" data-category="coin">文献邮币</button>
+                    <button class="filter-btn" data-category="nft">数字藏品</button>
+                    <button class="filter-btn" data-category="misc">杂项</button>
+                </div>
+                <div class="filter-status">
+                    <button class="filter-btn active" data-status="all">全部</button>
+                    <button class="filter-btn" data-status="sold">已拍卖</button>
+                    <button class="filter-btn" data-status="unsold">未拍卖</button>
+                    <button class="filter-btn" data-status="coming">即将拍卖</button>
+                </div>
+                <div class="featured-search">
+                    <input type="text" class="search-input" id="collectionSearchInput" placeholder="搜索藏品...">
+                    <button class="search-btn" id="collectionSearchBtn">🔍</button>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Collections Grid -->
+    <section class="section">
+        <div class="container">
+            <div class="featured-grid" id="collectionGrid">
+                <!-- 藏品卡片将通过JS动态生成 -->
+            </div>
+            <div class="pagination" id="pagination"></div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-brand">
+                    <h3 class="footer-logo"><img src="images/logo.png" alt="嘉孚堂" class="footer-logo-img"></h3>
+                    <p class="footer-tagline">让珍宝遇见知己</p>
+                </div>
+                <div class="footer-contact">
+                    <h4 class="footer-title">联系我们</h4>
+                    <p class="footer-item">📞 电话：400-888-8888</p>
+                    <p class="footer-item">📧 邮箱：service@jiafutang.com</p>
+                    <p class="footer-item">📍 地址：海南省海口区龙华富豪花园16号</p>
+                </div>
+                <div class="footer-links">
+                    <h4 class="footer-title">快速链接</h4>
+                    <a href="collections.html">藏品展示</a>
+                    <a href="consignment.html">征集流程</a>
+                    <a href="about.html">关于我们</a>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>&copy; 2026 嘉孚堂 版权所有</p>
+            </div>
+        </div>
+    </footer>
+
+    <script src="js/data.js"></script>
+    <script src="js/main.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // 初始化Filter Tabs
+            initCollectionFilter();
+            
+            // 加载藏品列表
+            loadCollections();
+        });
+        
+        function initCollectionFilter() {
+            // 分类Tab
+            const filterBtns = document.querySelectorAll('.filter-tabs .filter-btn');
+            filterBtns.forEach(btn => {
+                btn.addEventListener('click', function() {
+                    filterBtns.forEach(b => b.classList.remove('active'));
+                    this.classList.add('active');
+                    loadCollections();
+                });
+            });
+            
+            // 状态筛选
+            const statusBtns = document.querySelectorAll('.filter-status .filter-btn');
+            statusBtns.forEach(btn => {
+                btn.addEventListener('click', function() {
+                    statusBtns.forEach(b => b.classList.remove('active'));
+                    this.classList.add('active');
+                    loadCollections();
+                });
+            });
+            
+            // 搜索
+            const searchBtn = document.getElementById('collectionSearchBtn');
+            const searchInput = document.getElementById('collectionSearchInput');
+            
+            if (searchBtn) {
+                searchBtn.addEventListener('click', loadCollections);
+            }
+            if (searchInput) {
+                searchInput.addEventListener('keypress', function(e) {
+                    if (e.key === 'Enter') loadCollections();
+                });
+            }
+        }
+    </script>
+</body>
+</html>

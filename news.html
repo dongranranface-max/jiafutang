@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>新闻动态 - 嘉孚堂</title>
+    <meta name="description" content="嘉孚堂新闻动态，行业资讯，活动信息">
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="icon" type="image/x-icon" href="favicon.ico">
+    <link rel="apple-touch-icon" href="favicon.ico">
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@400;500;600&family=Noto+Serif+SC:wght@600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <!-- Header -->
+    <header class="header scrolled" id="header">
+        <div class="container header-inner">
+            <a href="index.html" class="logo">
+                <img src="images/logo.png" alt="嘉孚堂" class="logo-img">
+            </a>
+            <nav class="nav" id="nav">
+                <a href="index.html" class="nav-link">首页</a>
+                <a href="collections.html" class="nav-link">藏品展示</a>
+                <a href="consignment.html" class="nav-link">征集流程</a>
+                <a href="news.html" class="nav-link active">新闻动态</a>
+                <a href="about.html" class="nav-link">关于我们</a>
+            </nav>
+            <button class="hamburger" id="hamburger" aria-label="菜单">
+                <span></span>
+                <span></span>
+                <span></span>
+            </button>
+        </div>
+    </header>
+
+    <!-- Page Header -->
+    <section class="page-header">
+        <div class="container">
+            <h1>新闻动态</h1>
+            <p>最新资讯，了解行业动态</p>
+        </div>
+    </section>
+
+    <!-- Filter Section -->
+    <section class="filter-section">
+        <div class="container">
+            <div class="filter-bar">
+                <div class="filter-tabs">
+                    <button class="filter-btn active" data-category="all">全部</button>
+                    <button class="filter-btn" data-category="industry">行业动态</button>
+                    <button class="filter-btn" data-category="policy">政策法规</button>
+                    <button class="filter-btn" data-category="international">国际资讯</button>
+                    <button class="filter-btn" data-category="brand">嘉孚堂动态</button>
+                </div>
+                <div class="featured-search">
+                    <input type="text" class="search-input" id="newsSearchInput" placeholder="搜索新闻...">
+                    <button class="search-btn" id="newsSearchBtn">🔍</button>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- News Grid -->
+    <section class="section">
+        <div class="container">
+            <div class="news-grid" id="newsListGrid">
+                <!-- 新闻卡片将通过JS动态生成 -->
+            </div>
+            <div class="pagination" id="pagination"></div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-brand">
+                    <h3 class="footer-logo"><img src="images/logo.png" alt="嘉孚堂" class="footer-logo-img"></h3>
+                    <p class="footer-tagline">让珍宝遇见知己</p>
+                </div>
+                <div class="footer-contact">
+                    <h4 class="footer-title">联系我们</h4>
+                    <p class="footer-item">📞 电话：400-888-8888</p>
+                    <p class="footer-item">📧 邮箱：service@jiafutang.com</p>
+                    <p class="footer-item">📍 地址：海南省海口区龙华富豪花园16号</p>
+                </div>
+                <div class="footer-links">
+                    <h4 class="footer-title">快速链接</h4>
+                    <a href="collections.html">藏品展示</a>
+                    <a href="consignment.html">征集流程</a>
+                    <a href="about.html">关于我们</a>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>&copy; 2026 嘉孚堂 版权所有</p>
+            </div>
+        </div>
+    </footer>
+
+    <script src="js/data.js"></script>
+    <script src="js/main.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            initNewsFilter();
+            loadNews();
+        });
+        
+        function initNewsFilter() {
+            const filterBtns = document.querySelectorAll('.filter-tabs .filter-btn');
+            filterBtns.forEach(btn => {
+                btn.addEventListener('click', function() {
+                    filterBtns.forEach(b => b.classList.remove('active'));
+                    this.classList.add('active');
+                    loadNews();
+                });
+            });
+            
+            const searchBtn = document.getElementById('newsSearchBtn');
+            const searchInput = document.getElementById('newsSearchInput');
+            if (searchBtn) searchBtn.addEventListener('click', loadNews);
+            if (searchInput) searchInput.addEventListener('keypress', function(e) {
+                if (e.key === 'Enter') loadNews();
+            });
+        }
+    </script>
+</body>
+</html>

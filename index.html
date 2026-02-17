@@ -1,0 +1,229 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>嘉孚堂 - 让珍宝遇见知己</title>
+    <meta name="description" content="嘉孚堂官网，专业的艺术品收藏与征集服务平台">
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="icon" type="image/x-icon" href="favicon.ico">
+    <link rel="apple-touch-icon" href="favicon.ico">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@400;500;600&family=Noto+Serif+SC:wght@600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <!-- Header -->
+    <header class="header" id="header">
+        <div class="container header-inner">
+            <a href="index.html" class="logo">
+                <img src="images/logo.png" alt="嘉孚堂" class="logo-img">
+            </a>
+            <nav class="nav" id="nav">
+                <a href="index.html" class="nav-link active">首页</a>
+                <a href="collections.html" class="nav-link">藏品展示</a>
+                <a href="consignment.html" class="nav-link">征集流程</a>
+                <a href="news.html" class="nav-link">新闻动态</a>
+                <a href="about.html" class="nav-link">关于我们</a>
+            </nav>
+            <button class="hamburger" id="hamburger" aria-label="菜单">
+                <span></span>
+                <span></span>
+                <span></span>
+            </button>
+        </div>
+    </header>
+
+    <!-- Hero Section -->
+    <section class="hero" id="hero">
+        <div class="hero-slider" id="heroSlider">
+            <div class="hero-slide active" style="background-image: url('images/hero1.jpg')"></div>
+            <div class="hero-slide" style="background-image: url('images/hero2.jpg')"></div>
+            <div class="hero-slide" style="background-image: url('images/hero3.jpg')"></div>
+        </div>
+        <div class="hero-overlay"></div>
+        <div class="hero-content">
+            <h1 class="hero-title">让珍宝遇见知己</h1>
+            <p class="hero-subtitle">专业 · 信赖 · 高端</p>
+            <div class="hero-buttons">
+                <a href="submission.html" class="btn btn-primary">提交藏品</a>
+                <a href="collections.html" class="btn btn-secondary">鉴赏藏品</a>
+            </div>
+        </div>
+        <div class="hero-dots" id="heroDots">
+            <span class="dot active" data-index="0"></span>
+            <span class="dot" data-index="1"></span>
+            <span class="dot" data-index="2"></span>
+        </div>
+    </section>
+
+    <!-- 入口卡片区 -->
+    <section class="section entry-section">
+        <div class="container">
+            <div class="entry-grid">
+                <a href="about.html" class="entry-card">
+                    <div class="entry-icon">🏛️</div>
+                    <h3 class="entry-title">关于嘉孚堂</h3>
+                    <p class="entry-desc">了解我们的品牌故事</p>
+                </a>
+                <a href="collections.html" class="entry-card">
+                    <div class="entry-icon">🎨</div>
+                    <h3 class="entry-title">藏品展示</h3>
+                    <p class="entry-desc">精选艺术珍品</p>
+                </a>
+                <a href="consignment.html" class="entry-card">
+                    <div class="entry-icon">📋</div>
+                    <h3 class="entry-title">征集服务</h3>
+                    <p class="entry-desc">专业征集流程</p>
+                </a>
+                <a href="news.html" class="entry-card">
+                    <div class="entry-icon">📰</div>
+                    <h3 class="entry-title">新闻动态</h3>
+                    <p class="entry-desc">最新资讯活动</p>
+                </a>
+            </div>
+        </div>
+    </section>
+
+    <!-- 精品典藏 -->
+    <section class="section featured-section">
+        <div class="container">
+            <h2 class="section-title">精品典藏</h2>
+            <div class="featured-tabs">
+                <button class="tab-btn active" data-category="all">全部</button>
+                <button class="tab-btn" data-category="art">艺术品</button>
+                <button class="tab-btn" data-category="antique">古董文物</button>
+                <button class="tab-btn" data-category="jewelry">珠宝奢侈品</button>
+                <button class="tab-btn" data-category="coin">文献邮币</button>
+                <button class="tab-btn" data-category="nft">数字藏品</button>
+                <button class="tab-btn" data-category="misc">杂项</button>
+            </div>
+            <div class="featured-search">
+                <input type="text" class="search-input" id="homeSearchInput" placeholder="搜索藏品...">
+                <button class="search-btn" id="homeSearchBtn">🔍</button>
+            </div>
+            <div class="featured-grid" id="featuredGrid">
+                <!-- 藏品卡片将通过JS动态生成 -->
+            </div>
+            <div class="featured-more">
+                <a href="collections.html" class="btn btn-outline">查看更多</a>
+            </div>
+        </div>
+    </section>
+
+    <!-- 服务流程 -->
+    <section class="section process-section">
+        <div class="container">
+            <h2 class="section-title">服务流程</h2>
+            <div class="process-steps">
+                <div class="process-step">
+                    <div class="step-number">1</div>
+                    <h3 class="step-title">提交藏品</h3>
+                    <p class="step-desc">联系我们的工作人员，提交藏品基本信息</p>
+                </div>
+                <div class="process-arrow">→</div>
+                <div class="process-step">
+                    <div class="step-number">2</div>
+                    <h3 class="step-title">初步评估</h3>
+                    <p class="step-desc">专家团队对藏品进行初步价值评估</p>
+                </div>
+                <div class="process-arrow">→</div>
+                <div class="process-step">
+                    <div class="step-number">3</div>
+                    <h3 class="step-title">专家鉴定</h3>
+                    <p class="step-desc">专业鉴定机构进行真伪及年代鉴定</p>
+                </div>
+                <div class="process-arrow">→</div>
+                <div class="process-step">
+                    <div class="step-number">4</div>
+                    <h3 class="step-title">签订协议</h3>
+                    <p class="step-desc">确认合作意向，签订委托代理协议</p>
+                </div>
+                <div class="process-arrow">→</div>
+                <div class="process-step">
+                    <div class="step-number">5</div>
+                    <h3 class="step-title">宣传展示</h3>
+                    <p class="step-desc">全方位宣传推广，精准对接潜在藏家</p>
+                </div>
+            </div>
+            <div class="process-cta">
+                <a href="submission.html" class="btn btn-primary">立即提交藏品</a>
+            </div>
+        </div>
+    </section>
+
+    <!-- 成功案例 -->
+    <section class="section stats-section">
+        <div class="container">
+            <h2 class="section-title">成功案例</h2>
+            <div class="stats-grid">
+                <div class="stat-item">
+                    <div class="stat-number" data-target="500">0</div>
+                    <div class="stat-label">藏品</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-number" data-target="1200">0</div>
+                    <div class="stat-label">藏家</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-number" data-target="100">0</div>
+                    <div class="stat-label">展览</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-number" data-target="64">0</div>
+                    <div class="stat-label">合作伙伴</div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- 资讯动态 -->
+    <section class="section news-section">
+        <div class="container">
+            <h2 class="section-title">资讯动态</h2>
+            <div class="news-tabs">
+                <button class="tab-btn active" data-category="all">全部</button>
+                <button class="tab-btn" data-category="industry">行业动态</button>
+                <button class="tab-btn" data-category="policy">政策法规</button>
+                <button class="tab-btn" data-category="international">国际资讯</button>
+                <button class="tab-btn" data-category="brand">嘉孚堂动态</button>
+            </div>
+            <div class="news-grid" id="homeNewsGrid">
+                <!-- 新闻卡片将通过JS动态生成 -->
+            </div>
+            <div class="news-more">
+                <a href="news.html" class="btn btn-outline">查看更多</a>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-brand">
+                    <h3 class="footer-logo"><img src="images/logo.png" alt="嘉孚堂" class="footer-logo-img"></h3>
+                    <p class="footer-tagline">让珍宝遇见知己</p>
+                </div>
+                <div class="footer-contact">
+                    <h4 class="footer-title">联系我们</h4>
+                    <p class="footer-item">📞 电话：400-888-8888</p>
+                    <p class="footer-item">📧 邮箱：service@jiafutang.com</p>
+                    <p class="footer-item">📍 地址：海南省海口区龙华富豪花园16号</p>
+                </div>
+                <div class="footer-links">
+                    <h4 class="footer-title">快速链接</h4>
+                    <a href="collections.html">藏品展示</a>
+                    <a href="consignment.html">征集流程</a>
+                    <a href="about.html">关于我们</a>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>&copy; 2026 嘉孚堂 版权所有</p>
+            </div>
+        </div>
+    </footer>
+
+    <script src="js/data.js"></script>
+    <script src="js/main.js"></script>
+</body>
+</html>

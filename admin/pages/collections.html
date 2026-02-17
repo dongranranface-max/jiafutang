@@ -1,0 +1,358 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>藏品管理 - 嘉孚堂后台管理系统</title>
+    <link rel="stylesheet" href="../../css/style.css">
+    <link rel="stylesheet" href="../css/admin.css">
+</head>
+<body>
+    <div class="admin-wrapper">
+        <!-- 侧边栏 -->
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <img src="../../images/logo.png" alt="嘉孚堂">
+                <h2>后台管理</h2>
+            </div>
+            <nav class="sidebar-nav">
+                <a href="../dashboard.html" class="nav-item">
+                    <span>📊</span> <span>控制台</span>
+                </a>
+                <a href="collections.html" class="nav-item active">
+                    <span>🎨</span> <span>藏品管理</span>
+                </a>
+                <a href="news.html" class="nav-item">
+                    <span>📰</span> <span>新闻管理</span>
+                </a>
+                <a href="submissions.html" class="nav-item">
+                    <span>📋</span> <span>提交记录</span>
+                </a>
+                <a href="#" onclick="logout(); return false;" class="nav-item">
+                    <span>🚪</span> <span>退出登录</span>
+                </a>
+            </nav>
+        </aside>
+
+        <!-- 主内容 -->
+        <main class="main-content">
+            <div class="page-header">
+                <h1>藏品管理</h1>
+                <button class="btn-sm btn-view" onclick="openModal()">+ 添加藏品</button>
+            </div>
+
+            <!-- 筛选 -->
+            <div class="filter-bar">
+                <select id="filterCategory" onchange="renderTable()">
+                    <option value="">全部分类</option>
+                    <option value="art">艺术品</option>
+                    <option value="antique">古董文物</option>
+                    <option value="jewelry">珠宝奢侈品</option>
+                    <option value="coin">文献邮币</option>
+                    <option value="nft">数字藏品</option>
+                    <option value="misc">杂项</option>
+                </select>
+                <select id="filterStatus" onchange="renderTable()">
+                    <option value="">全部状态</option>
+                    <option value="unsold">未拍卖</option>
+                    <option value="sold">已拍卖</option>
+                    <option value="coming">即将拍卖</option>
+                </select>
+                <input type="text" id="searchKeyword" placeholder="搜索藏品..." oninput="renderTable()">
+            </div>
+
+            <!-- 表格 -->
+            <div class="table-wrapper">
+                <table class="data-table">
+                    <thead>
+                        <tr>
+                            <th>编号</th>
+                            <th>名称</th>
+                            <th>分类</th>
+                            <th>状态</th>
+                            <th>首页推荐</th>
+                            <th>操作</th>
+                        </tr>
+                    </thead>
+                    <tbody id="collectionsTable">
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- 分页 -->
+            <div class="pagination" id="pagination">
+            </div>
+        </main>
+    </div>
+
+    <!-- 添加/编辑弹窗 -->
+    <div class="modal-overlay" id="collectionModal">
+        <div class="modal">
+            <div class="modal-header">
+                <h3 id="modalTitle">添加藏品</h3>
+                <button class="modal-close" onclick="closeModal()">&times;</button>
+            </div>
+            <div class="modal-body">
+                <form id="collectionForm">
+                    <input type="hidden" id="collectionId">
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>藏品名称 *</label>
+                            <input type="text" id="itemTitle" required>
+                        </div>
+                        <div class="form-group">
+                            <label>品类 *</label>
+                            <select id="itemCategory" required>
+                                <option value="">请选择</option>
+                                <option value="art">艺术品</option>
+                                <option value="antique">古董文物</option>
+                                <option value="jewelry">珠宝奢侈品</option>
+                                <option value="coin">文献邮币</option>
+                                <option value="nft">数字藏品</option>
+                                <option value="misc">杂项</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>状态 *</label>
+                            <select id="itemStatus" required>
+                                <option value="unsold">未拍卖</option>
+                                <option value="sold">已拍卖</option>
+                                <option value="coming">即将拍卖</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label>首页推荐</label>
+                            <select id="itemFeatured">
+                                <option value="false">否</option>
+                                <option value="true">是</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label>封面图片URL</label>
+                        <input type="text" id="itemCoverImage" placeholder="https://...">
+                    </div>
+                    <div class="form-group">
+                        <label>简介</label>
+                        <textarea id="itemSummary" placeholder="简短描述..."></textarea>
+                    </div>
+                    <div class="form-group">
+                        <label>详细描述</label>
+                        <textarea id="itemContent" placeholder="详细描述内容..."></textarea>
+                    </div>
+                    <div class="form-actions">
+                        <button type="button" class="btn-cancel" onclick="closeModal()">取消</button>
+                        <button type="button" class="btn-save" onclick="saveCollection()">保存</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <script src="../js/auth.js"></script>
+    <script>
+        let collections = [];
+        let currentPage = 1;
+        const pageSize = 10;
+        
+        // 存储键名
+        const STORAGE_KEY = 'jiafu_collections';
+        
+        // 初始化
+        function init() {
+            loadCollections();
+        }
+        
+        // 加载藏品数据 - 优先从localStorage
+        function loadCollections() {
+            const stored = localStorage.getItem(STORAGE_KEY);
+            if (stored) {
+                try {
+                    collections = JSON.parse(stored);
+                } catch(e) {
+                    collections = getDefaultCollections();
+                }
+            } else {
+                collections = getDefaultCollections();
+                saveToStorage();
+            }
+            renderTable();
+        }
+        
+        // 默认数据
+        function getDefaultCollections() {
+            return [
+                {id:1,title:'清代紫檀木雕福禄寿屏风',category:'antique',status:'sold',coverImage:'https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=400',summary:'清代晚期紫檀木雕',isFeatured:true,sort:1},
+                {id:2,title:'民国粉彩人物故事瓶',category:'antique',status:'coming',coverImage:'https://images.unsplash.com/photo-1565193566173-7a0ee3dbe261?w=400',summary:'民国粉彩名品',isFeatured:true,sort:2},
+                {id:3,title:'明式黄花梨官帽椅',category:'antique',status:'sold',coverImage:'https://images.unsplash.com/photo-1506439773649-6e0eb8cfb237?w=400',summary:'明式家具',isFeatured:false,sort:3},
+                {id:4,title:'宋代建窑兔毫盏',category:'antique',status:'sold',coverImage:'https://images.unsplash.com/photo-1544787219-7f47ccb76574?w=400',summary:'宋代建窑',isFeatured:false,sort:4},
+                {id:5,title:'齐白石《虾趣图》',category:'art',status:'sold',coverImage:'https://images.unsplash.com/photo-1578926288207-a90a5366759d?w=400',summary:'齐白石精品',isFeatured:true,sort:5},
+                {id:6,title:'张大千《山水四条屏》',category:'art',status:'unsold',coverImage:'https://images.unsplash.com/photo-1605883705077-8d3d3cebe78c?w=400',summary:'张大千山水',isFeatured:true,sort:6},
+                {id:7,title:'傅抱石《山水长卷》',category:'art',status:'coming',coverImage:'https://images.unsplash.com/photo-1600636567129-674c947c29b7?w=400',summary:'傅抱石力作',isFeatured:false,sort:7},
+                {id:8,title:'徐悲鸿《奔马图》',category:'art',status:'unsold',coverImage:'https://images.unsplash.com/photo-1518998053901-5348d3961a04?w=400',summary:'徐悲鸿代表作',isFeatured:false,sort:8},
+                {id:9,title:'卡地亚钻石胸针',category:'jewelry',status:'unsold',coverImage:'https://images.unsplash.com/photo-1515562141207-7a88fb7ce338?w=400',summary:'卡地亚',isFeatured:true,sort:9},
+                {id:10,title:'翡翠手镯 玻璃种',category:'jewelry',status:'coming',coverImage:'https://images.unsplash.com/photo-1602751584552-8ba73aad10e1?w=400',summary:'玻璃种翡翠',isFeatured:true,sort:10},
+                {id:11,title:'梵克雅宝钻石项链',category:'jewelry',status:'sold',coverImage:'https://images.unsplash.com/photo-1599643478518-a784e5dc4c8f?w=400',summary:'梵克雅宝',isFeatured:false,sort:11},
+                {id:12,title:'红宝石戒指',category:'jewelry',status:'unsold',coverImage:'https://images.unsplash.com/photo-1605100804763-247f67b3557e?w=400',summary:'鸽血红宝石',isFeatured:false,sort:12},
+                {id:13,title:'第一版人民币全套',category:'coin',status:'sold',coverImage:'https://images.unsplash.com/photo-1621155346337-1d19476ba7d6?w=400',summary:'第一版人民币',isFeatured:true,sort:13},
+                {id:14,title:'文革时期珍邮票',category:'coin',status:'unsold',coverImage:'https://images.unsplash.com/photo-1580196929935-77f7a7a8e389?w=400',summary:'文革邮票',isFeatured:false,sort:14},
+                {id:15,title:'袁大头银元',category:'coin',status:'coming',coverImage:'https://images.unsplash.com/photo-1610375461246-83df859d849d?w=400',summary:'袁大头',isFeatured:false,sort:15},
+                {id:16,title:'古钱币一组',category:'coin',status:'unsold',coverImage:'https://images.unsplash.com/photo-1571752726703-5e7d1f6a986d?w=400',summary:'古钱币',isFeatured:false,sort:16},
+                {id:17,title:'NFT《创世之境》',category:'nft',status:'coming',coverImage:'https://images.unsplash.com/photo-1642104704074-907c0698cbd9?w=400',summary:'数字艺术品',isFeatured:true,sort:17},
+                {id:18,title:'NFT《星际幻想》',category:'nft',status:'unsold',coverImage:'https://images.unsplash.com/photo-1620641788421-7a1c342ea42e?w=400',summary:'限量版NFT',isFeatured:false,sort:18},
+                {id:19,title:'NFT《赛博朋克》',category:'nft',status:'sold',coverImage:'https://images.unsplash.com/photo-1634152962476-4b8a00e1915c?w=400',summary:'赛博朋克',isFeatured:false,sort:19},
+                {id:20,title:'NFT《抽象艺术》',category:'nft',status:'unsold',coverImage:'https://images.unsplash.com/photo-1618005198919-d3d4b5a92ead?w=400',summary:'抽象NFT',isFeatured:false,sort:20},
+                {id:21,title:'19世纪西洋座钟',category:'misc',status:'coming',coverImage:'https://images.unsplash.com/photo-1508057198894-247b23fe5ade?w=400',summary:'西洋座钟',isFeatured:false,sort:21},
+                {id:22,title:'劳力士手表',category:'misc',status:'sold',coverImage:'https://images.unsplash.com/photo-1523170335258-f5ed11844a49?w=400',summary:'劳力士',isFeatured:true,sort:22},
+                {id:23,title:'紫砂壶 名家款',category:'misc',status:'unsold',coverImage:'https://images.unsplash.com/photo-1565193566173-7a0ee3dbe261?w=400',summary:'紫砂壶',isFeatured:false,sort:23},
+                {id:24,title:'沉香手串',category:'misc',status:'coming',coverImage:'https://images.unsplash.com/photo-1611085583191-a3b181a88401?w=400',summary:'沉香',isFeatured:false,sort:24}
+            ];
+        }
+        
+        // 保存到localStorage
+        function saveToStorage() {
+            localStorage.setItem(STORAGE_KEY, JSON.stringify(collections));
+        }
+        
+        // 渲染表格
+        function renderTable() {
+            const category = document.getElementById('filterCategory').value;
+            const status = document.getElementById('filterStatus').value;
+            const keyword = document.getElementById('searchKeyword').value;
+            
+            let filtered = [...collections];
+            
+            if (category) filtered = filtered.filter(c => c.category === category);
+            if (status) filtered = filtered.filter(c => c.status === status);
+            if (keyword) filtered = filtered.filter(c => c.title.includes(keyword) || c.summary.includes(keyword));
+            
+            filtered.sort((a, b) => b.sort - a.sort);
+            
+            const totalPages = Math.ceil(filtered.length / pageSize);
+            const start = (currentPage - 1) * pageSize;
+            const paged = filtered.slice(start, start + pageSize);
+            
+            const tbody = document.getElementById('collectionsTable');
+            if (paged.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="6" class="empty-state">暂无数据</td></tr>';
+            } else {
+                const categoryMap = {art:'艺术品',antique:'古董文物',jewelry:'珠宝奢侈品',coin:'文献邮币',nft:'数字藏品',misc:'杂项'};
+                const statusMap = {unsold:'未拍卖',sold:'已拍卖',coming:'即将拍卖'};
+                
+                tbody.innerHTML = paged.map(c => `
+                    <tr>
+                        <td>${c.sort}</td>
+                        <td>${c.title}</td>
+                        <td>${categoryMap[c.category] || c.category}</td>
+                        <td>${statusMap[c.status] || c.status}</td>
+                        <td>${c.isFeatured ? '✅' : '❌'}</td>
+                        <td>
+                            <button class="btn-sm" onclick="editCollection(${c.id})">编辑</button>
+                            <button class="btn-sm btn-danger" onclick="deleteCollection(${c.id})">删除</button>
+                        </td>
+                    </tr>
+                `).join('');
+            }
+            
+            // 分页
+            const pagination = document.getElementById('pagination');
+            if (totalPages > 1) {
+                let html = '';
+                for (let i = 1; i <= totalPages; i++) {
+                    html += `<button class="${i === currentPage ? 'active' : ''}" onclick="goPage(${i})">${i}</button>`;
+                }
+                pagination.innerHTML = html;
+            } else {
+                pagination.innerHTML = '';
+            }
+        }
+        
+        function goPage(page) {
+            currentPage = page;
+            renderTable();
+        }
+        
+        // 打开弹窗
+        function openModal(id = null) {
+            const modal = document.getElementById('collectionModal');
+            const title = document.getElementById('modalTitle');
+            
+            if (id) {
+                const item = collections.find(c => c.id === id);
+                if (item) {
+                    title.textContent = '编辑藏品';
+                    document.getElementById('collectionId').value = item.id;
+                    document.getElementById('itemTitle').value = item.title;
+                    document.getElementById('itemCategory').value = item.category;
+                    document.getElementById('itemStatus').value = item.status;
+                    document.getElementById('itemFeatured').value = item.isFeatured ? 'true' : 'false';
+                    document.getElementById('itemCoverImage').value = item.coverImage || '';
+                    document.getElementById('itemSummary').value = item.summary || '';
+                    document.getElementById('itemContent').value = item.content || '';
+                }
+            } else {
+                title.textContent = '添加藏品';
+                document.getElementById('collectionForm').reset();
+                document.getElementById('collectionId').value = '';
+            }
+            
+            modal.classList.add('active');
+        }
+        
+        function closeModal() {
+            document.getElementById('collectionModal').classList.remove('active');
+        }
+        
+        // 保存藏品
+        function saveCollection() {
+            const id = document.getElementById('collectionId').value;
+            const data = {
+                title: document.getElementById('itemTitle').value,
+                category: document.getElementById('itemCategory').value,
+                status: document.getElementById('itemStatus').value,
+                isFeatured: document.getElementById('itemFeatured').value === 'true',
+                coverImage: document.getElementById('itemCoverImage').value,
+                summary: document.getElementById('itemSummary').value,
+                content: document.getElementById('itemContent').value
+            };
+            
+            if (!data.title || !data.category) {
+                alert('请填写必填项');
+                return;
+            }
+            
+            if (id) {
+                const index = collections.findIndex(c => c.id === parseInt(id));
+                collections[index] = { ...collections[index], ...data };
+            } else {
+                const newId = collections.length > 0 ? Math.max(...collections.map(c => c.id)) + 1 : 1;
+                collections.push({ id: newId, sort: newId, ...data });
+            }
+            
+            saveToStorage();
+            closeModal();
+            renderTable();
+            alert('保存成功！');
+        }
+        
+        // 编辑藏品
+        function editCollection(id) {
+            openModal(id);
+        }
+        
+        // 删除藏品
+        function deleteCollection(id) {
+            if (confirm('确定要删除这件藏品吗？')) {
+                collections = collections.filter(c => c.id !== id);
+                saveToStorage();
+                renderTable();
+            }
+        }
+        
+        // 初始化
+        init();
+    </script>
+</body>
+</html>

@@ -1,0 +1,14 @@
+# Robots.txt for 嘉孚堂官网
+
+User-agent: *
+Allow: /
+
+# Disallow admin/private areas
+Disallow: /js/
+Disallow: /css/
+
+# Sitemap
+Sitemap: https://www.jiafutang.com/sitemap.xml
+
+# Crawl-delay (optional, for polite crawlers)
+Crawl-delay: 1

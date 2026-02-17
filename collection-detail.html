@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>藏品详情 - 嘉孚堂</title>
+    <meta name="description" content="嘉孚堂藏品详情">
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="icon" type="image/x-icon" href="favicon.ico">
+    <link rel="apple-touch-icon" href="favicon.ico">
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@400;500;600&family=Noto+Serif+SC:wght@600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <!-- Header -->
+    <header class="header scrolled" id="header">
+        <div class="container header-inner">
+            <a href="index.html" class="logo">
+                <img src="images/logo.png" alt="嘉孚堂" class="logo-img">
+            </a>
+            <nav class="nav" id="nav">
+                <a href="index.html" class="nav-link">首页</a>
+                <a href="collections.html" class="nav-link active">藏品展示</a>
+                <a href="consignment.html" class="nav-link">征集流程</a>
+                <a href="news.html" class="nav-link">新闻动态</a>
+                <a href="about.html" class="nav-link">关于我们</a>
+            </nav>
+            <button class="hamburger" id="hamburger" aria-label="菜单">
+                <span></span>
+                <span></span>
+                <span></span>
+            </button>
+        </div>
+    </header>
+
+    <!-- Collection Detail -->
+    <section class="collection-detail">
+        <div class="container">
+            <a href="collections.html" class="news-back">← 返回藏品列表</a>
+            
+            <div class="collection-detail-grid">
+                <div class="collection-detail-gallery">
+                    <img class="collection-main-image" id="collectionMainImage" src="" alt="藏品图片">
+                    <div class="collection-thumbnails" id="collectionThumbs">
+                        <!-- 缩略图将通过JS动态生成 -->
+                    </div>
+                </div>
+                
+                <div class="collection-detail-info">
+                    <h1 id="collectionTitle">藏品标题</h1>
+                    <span class="collection-detail-status" id="collectionStatus">已拍卖</span>
+                    
+                    <div class="collection-detail-meta">
+                        <span>品类：<strong id="collectionCategory">艺术品</strong></span>
+                        <span>编号：<strong id="collectionId">001</strong></span>
+                    </div>
+                    
+                    <p class="collection-detail-desc" id="collectionDesc">
+                        藏品描述内容...
+                    </p>
+                    
+                    <div class="collection-detail-cta">
+                        <a href="submission.html" class="btn btn-primary">咨询详情</a>
+                        <a href="consignment.html" class="btn btn-outline">了解流程</a>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- 相关推荐 -->
+            <div class="collection-related">
+                <h2>相关推荐</h2>
+                <div class="featured-grid" id="relatedGrid">
+                    <!-- 相关藏品将通过JS动态生成 -->
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-brand">
+                    <h3 class="footer-logo"><img src="images/logo.png" alt="嘉孚堂" class="footer-logo-img"></h3>
+                    <p class="footer-tagline">让珍宝遇见知己</p>
+                </div>
+                <div class="footer-contact">
+                    <h4 class="footer-title">联系我们</h4>
+                    <p class="footer-item">📞 电话：400-888-8888</p>
+                    <p class="footer-item">📧 邮箱：service@jiafutang.com</p>
+                    <p class="footer-item">📍 地址：海南省海口区龙华富豪花园16号</p>
+                </div>
+                <div class="footer-links">
+                    <h4 class="footer-title">快速链接</h4>
+                    <a href="collections.html">藏品展示</a>
+                    <a href="consignment.html">征集流程</a>
+                    <a href="about.html">关于我们</a>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>&copy; 2026 嘉孚堂 版权所有</p>
+            </div>
+        </div>
+    </footer>
+
+    <script src="js/data.js"></script>
+    <script src="js/main.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            initHeader();
+            loadCollectionDetail();
+        });
+        
+        function initHeader() {
+            const hamburger = document.getElementById('hamburger');
+            const nav = document.getElementById('nav');
+            if (hamburger && nav) {
+                hamburger.addEventListener('click', function() {
+                    hamburger.classList.toggle('active');
+                    nav.classList.toggle('active');
+                });
+                nav.querySelectorAll('.nav-link').forEach(link => {
+                    link.addEventListener('click', function() {
+                        hamburger.classList.remove('active');
+                        nav.classList.remove('active');
+                    });
+                });
+            }
+        }
+        
+        function loadCollectionDetail() {
+            const id = parseInt(getUrlParam('id')) || 1;
+            const item = collections.find(c => c.id === id) || collections[0];
+            
+            // 主图
+            document.getElementById('collectionMainImage').src = item.images[0] || item.coverImage;
+            document.getElementById('collectionTitle').textContent = item.title;
+            
+            // 状态
+            const statusEl = document.getElementById('collectionStatus');
+            statusEl.textContent = COLLECTION_STATUS[item.status];
+            statusEl.className = 'collection-detail-status ' + item.status;
+            
+            // 元信息
+            document.getElementById('collectionCategory').textContent = COLLECTION_CATEGORIES[item.category];
+            document.getElementById('collectionId').textContent = String(item.id).padStart(3, '0');
+            document.getElementById('collectionDesc').textContent = item.content || item.summary;
+            
+            // 缩略图
+            const thumbsContainer = document.getElementById('collectionThumbs');
+            const images = item.images.length > 0 ? item.images : [item.coverImage];
+            thumbsContainer.innerHTML = images.map((img, index) => `
+                <div class="collection-thumb ${index === 0 ? 'active' : ''}" data-index="${index}">
+                    <img src="${img}" alt="缩略图${index + 1}">
+                </div>
+            `).join('');
+            
+            // 缩略图点击切换
+            thumbsContainer.querySelectorAll('.collection-thumb').forEach(thumb => {
+                thumb.addEventListener('click', function() {
+                    const index = this.dataset.index;
+                    document.getElementById('collectionMainImage').src = images[index];
+                    thumbsContainer.querySelectorAll('.collection-thumb').forEach(t => t.classList.remove('active'));
+                    this.classList.add('active');
+                });
+            });
+            
+            // 相关推荐
+            const related = collections.filter(c => c.category === item.category && c.id !== item.id).slice(0, 4);
+            const relatedGrid = document.getElementById('relatedGrid');
+            relatedGrid.innerHTML = related.map(c => `
+                <div class="collection-card" onclick="window.location.href='collection-detail.html?id=${c.id}'">
+                    <div class="card-image">
+                        <img src="${c.coverImage}" alt="${c.title}" loading="lazy">
+                        <span class="card-status ${c.status}">${COLLECTION_STATUS[c.status]}</span>
+                    </div>
+                    <div class="card-content">
+                        <h3 class="card-title">${c.title}</h3>
+                        <p class="card-meta">
+                            <span class="card-category">${COLLECTION_CATEGORIES[c.category]}</span>
+                        </p>
+                    </div>
+                </div>
+            `).join('');
+        }
+    </script>
+</body>
+</html>

@@ -1,0 +1,335 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>提交记录 - 嘉孚堂后台管理系统</title>
+    <link rel="stylesheet" href="../../css/style.css">
+    <link rel="stylesheet" href="../css/admin.css">
+</head>
+<body>
+    <div class="admin-wrapper">
+        <!-- 侧边栏 -->
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <img src="../../images/logo.png" alt="嘉孚堂">
+                <h2>后台管理</h2>
+            </div>
+            <nav class="sidebar-nav">
+                <a href="../dashboard.html" class="nav-item">
+                    <span>📊</span> <span>控制台</span>
+                </a>
+                <a href="collections.html" class="nav-item">
+                    <span>🎨</span> <span>藏品管理</span>
+                </a>
+                <a href="news.html" class="nav-item">
+                    <span>📰</span> <span>新闻管理</span>
+                </a>
+                <a href="submissions.html" class="nav-item active">
+                    <span>📋</span> <span>提交记录</span>
+                </a>
+                <a href="#" onclick="logout(); return false;" class="nav-item">
+                    <span>🚪</span> <span>退出登录</span>
+                </a>
+            </nav>
+        </aside>
+
+        <!-- 主内容 -->
+        <main class="main-content">
+            <div class="page-header">
+                <h1>提交记录</h1>
+                <button class="btn-sm btn-view" onclick="exportData()">导出数据</button>
+            </div>
+
+            <!-- 统计 -->
+            <div class="stats-grid" style="grid-template-columns: repeat(3, 1fr); margin-bottom: 24px;">
+                <div class="stat-card">
+                    <h3>总提交数</h3>
+                    <div class="number" id="totalCount">0</div>
+                </div>
+                <div class="stat-card">
+                    <h3>今日新增</h3>
+                    <div class="number" id="todayCount">0</div>
+                </div>
+                <div class="stat-card">
+                    <h3>待处理</h3>
+                    <div class="number" id="pendingCount">0</div>
+                </div>
+            </div>
+
+            <!-- 列表 -->
+            <div class="data-table-container">
+                <div class="table-toolbar">
+                    <div class="search-box">
+                        <select id="filterCategory">
+                            <option value="">全部分类</option>
+                            <option value="art">艺术品</option>
+                            <option value="antique">古董文物</option>
+                            <option value="jewelry">珠宝奢侈品</option>
+                            <option value="coin">文献邮币</option>
+                            <option value="nft">数字藏品</option>
+                            <option value="misc">杂项</option>
+                        </select>
+                        <input type="text" id="searchKeyword" placeholder="搜索藏品名称/联系人...">
+                        <button onclick="loadSubmissions()">搜索</button>
+                    </div>
+                </div>
+
+                <table class="data-table">
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>藏品名称</th>
+                            <th>品类</th>
+                            <th>联系人</th>
+                            <th>联系方式</th>
+                            <th>城市</th>
+                            <th>提交时间</th>
+                            <th>操作</th>
+                        </tr>
+                    </thead>
+                    <tbody id="submissionsTable">
+                        <!-- 数据将通过JS加载 -->
+                    </tbody>
+                </table>
+
+                <div class="pagination" id="pagination"></div>
+            </div>
+        </main>
+    </div>
+
+    <!-- 详情弹窗 -->
+    <div class="modal-overlay" id="detailModal">
+        <div class="modal">
+            <div class="modal-header">
+                <h3>提交详情</h3>
+                <button class="modal-close" onclick="closeModal()">&times;</button>
+            </div>
+            <div class="modal-body" id="detailContent">
+                <!-- 详情内容 -->
+            </div>
+            <div class="modal-footer">
+                <button class="btn-cancel" onclick="closeModal()">关闭</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="../js/auth.js"></script>
+    <script>
+        // 检查登录
+        checkAuth();
+        
+        let submissions = [];
+        let currentPage = 1;
+        const pageSize = 10;
+        
+        // 初始化
+        function init() {
+            loadSubmissions();
+        }
+        
+        // 加载提交数据
+        function loadSubmissions() {
+            const stored = localStorage.getItem('jiafu_submissions');
+            if (stored) {
+                submissions = JSON.parse(stored);
+            } else {
+                // 模拟一些数据
+                submissions = [
+                    {id: 1, itemName: '清代瓷器花瓶', itemCategory: 'antique', itemDesc: '清代晚期青花瓷', contactName: '张三', contactMobile: '13800138000', contactWechat: 'zhangsan', city: '北京', createdAt: '2026-02-17T10:30:00', handleStatus: 'pending'},
+                    {id: 2, itemName: '齐白石画作', itemCategory: 'art', itemDesc: '名家字画', contactName: '李四', contactMobile: '13900139000', city: '上海', createdAt: '2026-02-16T15:20:00', handleStatus: 'processed'},
+                    {id: 3, itemName: '翡翠手镯', itemCategory: 'jewelry', itemDesc: '玻璃种翡翠', contactName: '王五', contactWechat: 'wangwu', city: '广州', createdAt: '2026-02-15T09:00:00', handleStatus: 'pending'}
+                ];
+                saveToStorage();
+            }
+            
+            renderStats();
+            renderTable();
+        }
+        
+        // 保存到localStorage
+        function saveToStorage() {
+            localStorage.setItem('jiafu_submissions', JSON.stringify(submissions));
+        }
+        
+        // 渲染统计
+        function renderStats() {
+            const today = new Date().toISOString().split('T')[0];
+            
+            document.getElementById('totalCount').textContent = submissions.length;
+            document.getElementById('todayCount').textContent = submissions.filter(s => s.createdAt.startsWith(today)).length;
+            document.getElementById('pendingCount').textContent = submissions.filter(s => s.handleStatus !== 'processed').length;
+        }
+        
+        // 渲染表格
+        function renderTable() {
+            const category = document.getElementById('filterCategory').value;
+            const keyword = document.getElementById('searchKeyword').value;
+            
+            let filtered = [...submissions];
+            
+            if (category) filtered = filtered.filter(s => s.itemCategory === category);
+            if (keyword) {
+                const kw = keyword.toLowerCase();
+                filtered = filtered.filter(s => 
+                    (s.itemName && s.itemName.toLowerCase().includes(kw)) ||
+                    (s.contactName && s.contactName.toLowerCase().includes(kw))
+                );
+            }
+            
+            // 按时间排序
+            filtered.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
+            
+            // 分页
+            const totalPages = Math.ceil(filtered.length / pageSize);
+            const start = (currentPage - 1) * pageSize;
+            const paged = filtered.slice(start, start + pageSize);
+            
+            const tbody = document.getElementById('submissionsTable');
+            if (paged.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="8" class="empty-state">暂无数据</td></tr>';
+            } else {
+                tbody.innerHTML = paged.map(s => `
+                    <tr>
+                        <td>${s.id}</td>
+                        <td>${s.itemName || '-'}</td>
+                        <td>${getCategoryName(s.itemCategory)}</td>
+                        <td>${s.contactName || '-'}</td>
+                        <td>${s.contactMobile || s.contactWechat || '-'}</td>
+                        <td>${s.city || '-'}</td>
+                        <td>${formatDate(s.createdAt)}</td>
+                        <td class="actions">
+                            <button class="btn-sm btn-view" onclick="viewDetail(${s.id})">查看</button>
+                            <button class="btn-sm btn-edit" onclick="markProcessed(${s.id})">标记已处理</button>
+                        </td>
+                    </tr>
+                `).join('');
+            }
+            
+            renderPagination(totalPages);
+        }
+        
+        // 分页
+        function renderPagination(totalPages) {
+            const pagination = document.getElementById('pagination');
+            if (totalPages <= 1) {
+                pagination.innerHTML = '';
+                return;
+            }
+            
+            let html = `<button ${currentPage === 1 ? 'disabled' : ''} onclick="goPage(${currentPage - 1})">上一页</button>`;
+            for (let i = 1; i <= totalPages; i++) {
+                html += `<button class="${i === currentPage ? 'active' : ''}" onclick="goPage(${i})">${i}</button>`;
+            }
+            html += `<button ${currentPage === totalPages ? 'disabled' : ''} onclick="goPage(${currentPage + 1})">下一页</button>`;
+            pagination.innerHTML = html;
+        }
+        
+        function goPage(page) {
+            currentPage = page;
+            renderTable();
+        }
+        
+        // 辅助函数
+        function getCategoryName(category) {
+            const names = {'art': '艺术品', 'antique': '古董文物', 'jewelry': '珠宝奢侈品', 'coin': '文献邮币', 'nft': '数字藏品', 'misc': '杂项'};
+            return names[category] || category;
+        }
+        
+        function formatDate(dateStr) {
+            if (!dateStr) return '-';
+            const date = new Date(dateStr);
+            return date.toLocaleDateString('zh-CN') + ' ' + date.toLocaleTimeString('zh-CN', {hour: '2-digit', minute: '2-digit'});
+        }
+        
+        // 查看详情
+        function viewDetail(id) {
+            const item = submissions.find(s => s.id === id);
+            if (!item) return;
+            
+            document.getElementById('detailContent').innerHTML = `
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>藏品名称</label>
+                        <p>${item.itemName || '-'}</p>
+                    </div>
+                    <div class="form-group">
+                        <label>品类</label>
+                        <p>${getCategoryName(item.itemCategory)}</p>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label>藏品描述</label>
+                    <p>${item.itemDesc || '-'}</p>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>联系人</label>
+                        <p>${item.contactName || '-'}</p>
+                    </div>
+                    <div class="form-group">
+                        <label>手机号</label>
+                        <p>${item.contactMobile || '-'}</p>
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>微信号</label>
+                        <p>${item.contactWechat || '-'}</p>
+                    </div>
+                    <div class="form-group">
+                        <label>所在城市</label>
+                        <p>${item.city || '-'}</p>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label>提交时间</label>
+                    <p>${formatDate(item.createdAt)}</p>
+                </div>
+                <div class="form-group">
+                    <label>处理状态</label>
+                    <p>${item.handleStatus === 'processed' ? '✅ 已处理' : '⏳ 待处理'}</p>
+                </div>
+            `;
+            
+            document.getElementById('detailModal').classList.add('active');
+        }
+        
+        // 关闭弹窗
+        function closeModal() {
+            document.getElementById('detailModal').classList.remove('active');
+        }
+        
+        // 标记已处理
+        function markProcessed(id) {
+            if (confirm('确定要将此提交标记为已处理吗？')) {
+                const index = submissions.findIndex(s => s.id === id);
+                if (index > -1) {
+                    submissions[index].handleStatus = 'processed';
+                    saveToStorage();
+                    loadSubmissions();
+                }
+            }
+        }
+        
+        // 导出数据
+        function exportData() {
+            let csv = 'ID,藏品名称,品类,联系人,手机号,微信,城市,提交时间,处理状态\n';
+            submissions.forEach(s => {
+                csv += `${s.id},"${s.itemName || ''}",${getCategoryName(s.itemCategory)},"${s.contactName || ''}","${s.contactMobile || ''}","${s.contactWechat || ''}","${s.city || ''}","${s.createdAt}","${s.handleStatus === 'processed' ? '已处理' : '待处理'}"\n`;
+            });
+            
+            const blob = new Blob(['\ufeff' + csv], {type: 'text/csv;charset=utf-8'});
+            const link = document.createElement('a');
+            link.href = URL.createObjectURL(blob);
+            link.download = `藏品提交记录_${new Date().toISOString().split('T')[0]}.csv`;
+            link.click();
+        }
+        
+        // 监听筛选
+        document.getElementById('filterCategory').addEventListener('change', loadSubmissions);
+        
+        init();
+    </script>
+</body>
+</html>

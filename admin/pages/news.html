@@ -1,0 +1,306 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>新闻管理 - 嘉孚堂后台管理系统</title>
+    <link rel="stylesheet" href="../../css/style.css">
+    <link rel="stylesheet" href="../css/admin.css">
+</head>
+<body>
+    <div class="admin-wrapper">
+        <!-- 侧边栏 -->
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <img src="../../images/logo.png" alt="嘉孚堂">
+                <h2>后台管理</h2>
+            </div>
+            <nav class="sidebar-nav">
+                <a href="../dashboard.html" class="nav-item">
+                    <span>📊</span> <span>控制台</span>
+                </a>
+                <a href="collections.html" class="nav-item">
+                    <span>🎨</span> <span>藏品管理</span>
+                </a>
+                <a href="news.html" class="nav-item active">
+                    <span>📰</span> <span>新闻管理</span>
+                </a>
+                <a href="submissions.html" class="nav-item">
+                    <span>📋</span> <span>提交记录</span>
+                </a>
+                <a href="#" onclick="logout(); return false;" class="nav-item">
+                    <span>🚪</span> <span>退出登录</span>
+                </a>
+            </nav>
+        </aside>
+
+        <!-- 主内容 -->
+        <main class="main-content">
+            <div class="page-header">
+                <h1>新闻管理</h1>
+                <button class="btn-sm btn-view" onclick="openModal()">+ 添加新闻</button>
+            </div>
+
+            <!-- 筛选 -->
+            <div class="filter-bar">
+                <select id="filterCategory" onchange="renderTable()">
+                    <option value="">全部分类</option>
+                    <option value="brand">嘉孚堂动态</option>
+                    <option value="industry">行业动态</option>
+                </select>
+                <input type="text" id="searchKeyword" placeholder="搜索新闻..." oninput="renderTable()">
+            </div>
+
+            <!-- 表格 -->
+            <div class="table-wrapper">
+                <table class="data-table">
+                    <thead>
+                        <tr>
+                            <th>编号</th>
+                            <th>标题</th>
+                            <th>分类</th>
+                            <th>发布时间</th>
+                            <th>置顶</th>
+                            <th>操作</th>
+                        </tr>
+                    </thead>
+                    <tbody id="newsTable">
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- 分页 -->
+            <div class="pagination" id="pagination">
+            </div>
+        </main>
+    </div>
+
+    <!-- 添加/编辑弹窗 -->
+    <div class="modal-overlay" id="newsModal">
+        <div class="modal">
+            <div class="modal-header">
+                <h3 id="modalTitle">添加新闻</h3>
+                <button class="modal-close" onclick="closeModal()">&times;</button>
+            </div>
+            <div class="modal-body">
+                <form id="newsForm">
+                    <input type="hidden" id="newsId">
+                    <div class="form-group">
+                        <label>标题 *</label>
+                        <input type="text" id="newsTitle" required>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>分类 *</label>
+                            <select id="newsCategory" required>
+                                <option value="">请选择</option>
+                                <option value="brand">嘉孚堂动态</option>
+                                <option value="industry">行业动态</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label>首页置顶</label>
+                            <select id="newsTop">
+                                <option value="false">否</option>
+                                <option value="true">是</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label>封面图片URL</label>
+                        <input type="text" id="newsCoverImage" placeholder="https://...">
+                    </div>
+                    <div class="form-group">
+                        <label>摘要</label>
+                        <textarea id="newsSummary" placeholder="简短摘要..."></textarea>
+                    </div>
+                    <div class="form-group">
+                        <label>正文内容 (HTML)</label>
+                        <textarea id="newsContent" style="min-height: 150px;" placeholder="<p>正文内容...</p>"></textarea>
+                    </div>
+                    <div class="form-actions">
+                        <button type="button" class="btn-cancel" onclick="closeModal()">取消</button>
+                        <button type="button" class="btn-save" onclick="saveNews()">保存</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <script src="../js/auth.js"></script>
+    <script>
+        let newsList = [];
+        let currentPage = 1;
+        const pageSize = 10;
+        
+        // 存储键名
+        const STORAGE_KEY = 'jiafu_news';
+        
+        // 初始化
+        function init() {
+            loadNews();
+        }
+        
+        // 加载新闻数据 - 优先从localStorage
+        function loadNews() {
+            const stored = localStorage.getItem(STORAGE_KEY);
+            if (stored) {
+                try {
+                    newsList = JSON.parse(stored);
+                } catch(e) {
+                    newsList = getDefaultNews();
+                }
+            } else {
+                newsList = getDefaultNews();
+                saveToStorage();
+            }
+            renderTable();
+        }
+        
+        // 默认数据
+        function getDefaultNews() {
+            return [
+                {id:1,title:'2026年春季艺术品拍卖会圆满落幕',category:'brand',coverImage:'https://images.unsplash.com/photo-1518998053901-5348d3961a04?w=600',summary:'成交总额突破5亿元',isTop:true,sort:1},
+                {id:2,title:'收藏市场持续升温',category:'industry',coverImage:'https://images.unsplash.com/photo-1578926288207-a90a5366759d?w=600',summary:'市场持续升温',isTop:false,sort:2},
+                {id:3,title:'嘉孚堂开通线上藏品征集服务',category:'brand',coverImage:'https://images.unsplash.com/photo-1621155346337-1d19476ba7d6?w=600',summary:'开通服务',isTop:false,sort:3}
+            ];
+        }
+        
+        // 保存到localStorage
+        function saveToStorage() {
+            localStorage.setItem(STORAGE_KEY, JSON.stringify(newsList));
+        }
+        
+        // 渲染表格
+        function renderTable() {
+            const category = document.getElementById('filterCategory').value;
+            const keyword = document.getElementById('searchKeyword').value;
+            
+            let filtered = [...newsList];
+            
+            if (category) filtered = filtered.filter(n => n.category === category);
+            if (keyword) filtered = filtered.filter(n => n.title.includes(keyword) || n.summary.includes(keyword));
+            
+            filtered.sort((a, b) => b.sort - a.sort);
+            
+            const totalPages = Math.ceil(filtered.length / pageSize);
+            const start = (currentPage - 1) * pageSize;
+            const paged = filtered.slice(start, start + pageSize);
+            
+            const tbody = document.getElementById('newsTable');
+            if (paged.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="6" class="empty-state">暂无数据</td></tr>';
+            } else {
+                tbody.innerHTML = paged.map(n => `
+                    <tr>
+                        <td>${n.sort}</td>
+                        <td>${n.title}</td>
+                        <td>${n.category === 'brand' ? '嘉孚堂动态' : '行业动态'}</td>
+                        <td>${new Date().toLocaleDateString()}</td>
+                        <td>${n.isTop ? '✅' : '❌'}</td>
+                        <td>
+                            <button class="btn-sm" onclick="editNews(${n.id})">编辑</button>
+                            <button class="btn-sm btn-danger" onclick="deleteNews(${n.id})">删除</button>
+                        </td>
+                    </tr>
+                `).join('');
+            }
+            
+            // 分页
+            const pagination = document.getElementById('pagination');
+            if (totalPages > 1) {
+                let html = '';
+                for (let i = 1; i <= totalPages; i++) {
+                    html += `<button class="${i === currentPage ? 'active' : ''}" onclick="goPage(${i})">${i}</button>`;
+                }
+                pagination.innerHTML = html;
+            } else {
+                pagination.innerHTML = '';
+            }
+        }
+        
+        function goPage(page) {
+            currentPage = page;
+            renderTable();
+        }
+        
+        // 打开弹窗
+        function openModal(id = null) {
+            const modal = document.getElementById('newsModal');
+            const title = document.getElementById('modalTitle');
+            
+            if (id) {
+                const item = newsList.find(n => n.id === id);
+                if (item) {
+                    title.textContent = '编辑新闻';
+                    document.getElementById('newsId').value = item.id;
+                    document.getElementById('newsTitle').value = item.title;
+                    document.getElementById('newsCategory').value = item.category;
+                    document.getElementById('newsTop').value = item.isTop ? 'true' : 'false';
+                    document.getElementById('newsCoverImage').value = item.coverImage || '';
+                    document.getElementById('newsSummary').value = item.summary || '';
+                    document.getElementById('newsContent').value = item.content || '';
+                }
+            } else {
+                title.textContent = '添加新闻';
+                document.getElementById('newsForm').reset();
+                document.getElementById('newsId').value = '';
+            }
+            
+            modal.classList.add('active');
+        }
+        
+        function closeModal() {
+            document.getElementById('newsModal').classList.remove('active');
+        }
+        
+        // 保存新闻
+        function saveNews() {
+            const id = document.getElementById('newsId').value;
+            const data = {
+                title: document.getElementById('newsTitle').value,
+                category: document.getElementById('newsCategory').value,
+                isTop: document.getElementById('newsTop').value === 'true',
+                coverImage: document.getElementById('newsCoverImage').value,
+                summary: document.getElementById('newsSummary').value,
+                content: document.getElementById('newsContent').value
+            };
+            
+            if (!data.title || !data.category) {
+                alert('请填写必填项');
+                return;
+            }
+            
+            if (id) {
+                const index = newsList.findIndex(n => n.id === parseInt(id));
+                newsList[index] = { ...newsList[index], ...data };
+            } else {
+                const newId = newsList.length > 0 ? Math.max(...newsList.map(n => n.id)) + 1 : 1;
+                newsList.push({ id: newId, sort: newId, ...data });
+            }
+            
+            saveToStorage();
+            closeModal();
+            renderTable();
+            alert('保存成功！');
+        }
+        
+        // 编辑新闻
+        function editNews(id) {
+            openModal(id);
+        }
+        
+        // 删除新闻
+        function deleteNews(id) {
+            if (confirm('确定要删除这条新闻吗？')) {
+                newsList = newsList.filter(n => n.id !== id);
+                saveToStorage();
+                renderTable();
+            }
+        }
+        
+        // 初始化
+        init();
+    </script>
+</body>
+</html>
