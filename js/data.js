@@ -17,7 +17,7 @@ const COLLECTION_STATUS = {
 };
 
 const NEWS_CATEGORIES = {
-    all: '全部', brand: '嘉孚堂动态', industry: '行业动态', international: '国际资讯'
+    all: '全部', brand: '嘉孚堂动态', industry: '行业动态'
 };
 
 // ============ 数据加载 ============
