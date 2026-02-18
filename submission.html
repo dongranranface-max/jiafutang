@@ -9,6 +9,31 @@
     <link rel="icon" type="image/x-icon" href="favicon.ico">
     <link rel="apple-touch-icon" href="favicon.ico">
     <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@400;500;600&family=Noto+Serif+SC:wght@600;700&display=swap" rel="stylesheet">
+    <style>
+        .quick-form { max-width: 500px; margin: 0 auto; background: #fff; padding: 40px; border-radius: 16px; box-shadow: 0 4px 30px rgba(0,0,0,0.08); }
+        .quick-form h2 { text-align: center; margin-bottom: 30px; font-size: 24px; color: #333; }
+        .quick-form .form-group { margin-bottom: 20px; }
+        .quick-form .form-label { display: block; margin-bottom: 8px; font-size: 14px; color: #333; font-weight: 500; }
+        .quick-form .form-input, .quick-form .form-select { width: 100%; padding: 14px 16px; border: 1px solid #e0e0e0; border-radius: 10px; font-size: 15px; transition: all 0.3s; box-sizing: border-box; }
+        .quick-form .form-input:focus, .quick-form .form-select:focus { border-color: #B8860B; outline: none; box-shadow: 0 0 0 3px rgba(184,134,11,0.1); }
+        .quick-form .form-textarea { width: 100%; padding: 14px 16px; border: 1px solid #e0e0e0; border-radius: 10px; font-size: 15px; min-height: 100px; resize: vertical; box-sizing: border-box; }
+        .quick-form .btn-submit { width: 100%; padding: 16px; font-size: 16px; margin-top: 10px; }
+        .quick-form .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+        .quick-form .form-file { border: 2px dashed #ddd; border-radius: 12px; padding: 30px; text-align: center; cursor: pointer; transition: all 0.3s; }
+        .quick-form .form-file:hover { border-color: #B8860B; background: #faf8f5; }
+        .quick-form .form-file-icon { font-size: 36px; margin-bottom: 10px; }
+        .quick-form .form-file-text { color: #888; font-size: 13px; line-height: 1.5; }
+        .quick-form .form-file input { display: none; }
+        .quick-form .upload-tips { font-size: 12px; color: #999; margin-top: 8px; }
+        .success-message { text-align: center; padding: 60px 20px; display: none; }
+        .success-message .icon { font-size: 64px; margin-bottom: 20px; }
+        .success-message h3 { font-size: 24px; color: #333; margin-bottom: 10px; }
+        .success-message p { color: #666; margin-bottom: 30px; }
+        @media (max-width: 600px) {
+            .quick-form { padding: 25px; }
+            .quick-form .form-row { grid-template-columns: 1fr; }
+        }
+    </style>
 </head>
 <body>
     <!-- Header -->
@@ -36,28 +61,26 @@
     <section class="page-header">
         <div class="container">
             <h1>提交藏品</h1>
-            <p>填写藏品信息，我们将尽快与您联系</p>
+            <p>填写基本信息，快速提交藏品</p>
         </div>
     </section>
 
-    <!-- Form Section -->
-    <section class="form-section">
+    <!-- Quick Form -->
+    <section class="form-section" style="background:#f5f5f5;padding:40px 0 60px;">
         <div class="container">
-            <div class="form-container">
+            <!-- 表单 -->
+            <div class="quick-form" id="formContainer">
+                <h2>快速提交藏品</h2>
                 <form id="submissionForm">
-                    <!-- 藏品信息 -->
-                    <h3 style="margin-bottom: 24px; font-family: var(--font-serif);">藏品信息</h3>
-                    
                     <div class="form-group">
-                        <label class="form-label">藏品名称 <span class="required">*</span></label>
-                        <input type="text" class="form-input" id="itemName" name="itemName" required maxlength="100" placeholder="请输入藏品名称">
-                        <p class="form-error">请输入藏品名称</p>
+                        <label class="form-label">藏品名称 *</label>
+                        <input type="text" class="form-input" id="itemName" required placeholder="请输入藏品名称">
                     </div>
                     
                     <div class="form-group">
-                        <label class="form-label">品类 <span class="required">*</span></label>
-                        <select class="form-select" id="itemCategory" name="itemCategory" required>
-                            <option value="">请选择品类</option>
+                        <label class="form-label">藏品类别 *</label>
+                        <select class="form-select" id="itemCategory" required>
+                            <option value="">请选择类别</option>
                             <option value="art">艺术品</option>
                             <option value="antique">古董文物</option>
                             <option value="jewelry">珠宝奢侈品</option>
@@ -65,60 +88,49 @@
                             <option value="nft">数字藏品</option>
                             <option value="misc">杂项</option>
                         </select>
-                        <p class="form-error">请选择品类</p>
                     </div>
                     
                     <div class="form-group">
-                        <label class="form-label">藏品图片（至少1张，最多6张）</label>
-                        <label class="form-file" for="itemImages">
-                            <input type="file" id="itemImages" name="itemImages" accept="image/*" multiple>
-                            <div class="form-file-icon">📁</div>
-                            <p class="form-file-text">点击或拖拽上传图片<br>支持 JPG、PNG 格式，单张不超过5MB</p>
+                        <label class="form-label">上传藏品图片</label>
+                        <label class="form-file">
+                            <input type="file" id="itemImages" accept="image/*" multiple>
+                            <div class="form-file-icon">📷</div>
+                            <p class="form-file-text">点击上传图片<br>支持 JPG、PNG</p>
                         </label>
-                        <div class="image-preview"></div>
+                        <p class="upload-tips">可上传多张图片，更有助于专家评估</p>
                     </div>
                     
                     <div class="form-group">
-                        <label class="form-label">藏品描述</label>
-                        <textarea class="form-textarea" id="itemDesc" name="itemDesc" maxlength="500" placeholder="请描述藏品的详细信息，如年代、材质、尺寸、来源等"></textarea>
+                        <label class="form-label">简单描述</label>
+                        <textarea class="form-textarea" id="itemDesc" placeholder="如：年代、材质、尺寸、来源等（选填）"></textarea>
                     </div>
                     
-                    <!-- 联系方式 -->
-                    <h3 style="margin: 32px 0 24px; font-family: var(--font-serif);">联系方式</h3>
-                    
-                    <div class="form-group">
-                        <label class="form-label">联系人姓名 <span class="required">*</span></label>
-                        <input type="text" class="form-input" id="contactName" name="contactName" required minlength="2" maxlength="20" placeholder="请输入您的姓名">
-                        <p class="form-error">请输入联系人姓名（2-20字符）</p>
-                    </div>
-                    
-                    <div class="form-group">
-                        <label class="form-label">手机号</label>
-                        <input type="tel" class="form-input" id="contactMobile" name="contactMobile" placeholder="请输入手机号">
-                        <p class="form-error">请输入正确的手机号格式</p>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label class="form-label">您的姓名 *</label>
+                            <input type="text" class="form-input" id="contactName" required placeholder="联系人">
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">手机号 *</label>
+                            <input type="tel" class="form-input" id="contactMobile" required placeholder="手机号">
+                        </div>
                     </div>
                     
                     <div class="form-group">
                         <label class="form-label">微信号</label>
-                        <input type="text" class="form-input" id="contactWechat" name="contactWechat" minlength="3" maxlength="20" placeholder="请输入微信号">
+                        <input type="text" class="form-input" id="contactWechat" placeholder="微信号（选填）">
                     </div>
                     
-                    <div class="form-group">
-                        <label class="form-label">所在城市</label>
-                        <input type="text" class="form-input" id="contactCity" name="contactCity" maxlength="20" placeholder="请输入所在城市">
-                    </div>
-                    
-                    <div class="form-group">
-                        <label class="form-checkbox">
-                            <input type="checkbox" id="privacyAgree" name="privacyAgree" required>
-                            <span>我已阅读并同意 <a href="privacy.html" target="_blank" style="color: var(--color-primary);">《隐私条款》</a> <span class="required">*</span></span>
-                        </label>
-                    </div>
-                    
-                    <div class="form-submit">
-                        <button type="submit" class="btn btn-primary">提交信息</button>
-                    </div>
+                    <button type="submit" class="btn btn-primary btn-submit">提交藏品</button>
                 </form>
+            </div>
+            
+            <!-- 成功提示 -->
+            <div class="quick-form success-message" id="successMessage">
+                <div class="icon">✅</div>
+                <h3>提交成功！</h3>
+                <p>感谢您的提交，我们的专家团队将在24小时内与您联系</p>
+                <a href="index.html" class="btn btn-primary">返回首页</a>
             </div>
         </div>
     </section>
@@ -150,6 +162,30 @@
         </div>
     </footer>
 
+    <script>
+    document.getElementById('submissionForm').addEventListener('submit', function(e) {
+        e.preventDefault();
+        
+        const data = {
+            itemName: document.getElementById('itemName').value,
+            itemCategory: document.getElementById('itemCategory').value,
+            itemDesc: document.getElementById('itemDesc').value,
+            contactName: document.getElementById('contactName').value,
+            contactMobile: document.getElementById('contactMobile').value,
+            contactWechat: document.getElementById('contactWechat').value,
+            createdAt: new Date().toISOString()
+        };
+        
+        // 保存到本地存储（演示用）
+        const submissions = JSON.parse(localStorage.getItem('jiafutang_submissions') || '[]');
+        submissions.push(data);
+        localStorage.setItem('jiafutang_submissions', JSON.stringify(submissions));
+        
+        // 显示成功
+        document.getElementById('formContainer').style.display = 'none';
+        document.getElementById('successMessage').style.display = 'block';
+    });
+    </script>
     <script src="js/data.js"></script>
 </body>
 </html>
