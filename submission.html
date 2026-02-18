@@ -166,25 +166,52 @@
     document.getElementById('submissionForm').addEventListener('submit', function(e) {
         e.preventDefault();
         
-        const data = {
-            itemName: document.getElementById('itemName').value,
-            itemCategory: document.getElementById('itemCategory').value,
-            itemDesc: document.getElementById('itemDesc').value,
-            contactName: document.getElementById('contactName').value,
-            contactMobile: document.getElementById('contactMobile').value,
-            contactWechat: document.getElementById('contactWechat').value,
-            createdAt: new Date().toISOString()
+        // 获取图片文件
+        const fileInput = document.getElementById('itemImages');
+        const images = fileInput.files;
+        
+        // 如果有图片，转换为base64保存（演示用）
+        const processImages = async () => {
+            let imageUrls = [];
+            if (images && images.length > 0) {
+                for (let i = 0; i < Math.min(images.length, 3); i++) {
+                    const base64 = await toBase64(images[i]);
+                    imageUrls.push(base64);
+                }
+            }
+            
+            const data = {
+                itemName: document.getElementById('itemName').value,
+                itemCategory: document.getElementById('itemCategory').value,
+                itemDesc: document.getElementById('itemDesc').value,
+                contactName: document.getElementById('contactName').value,
+                contactMobile: document.getElementById('contactMobile').value,
+                contactWechat: document.getElementById('contactWechat').value,
+                itemImages: imageUrls,
+                createdAt: new Date().toISOString()
+            };
+            
+            // 保存到本地存储（演示用）
+            const submissions = JSON.parse(localStorage.getItem('jiafutang_submissions') || '[]');
+            submissions.push(data);
+            localStorage.setItem('jiafutang_submissions', JSON.stringify(submissions));
+            
+            // 显示成功
+            document.getElementById('formContainer').style.display = 'none';
+            document.getElementById('successMessage').style.display = 'block';
         };
         
-        // 保存到本地存储（演示用）
-        const submissions = JSON.parse(localStorage.getItem('jiafutang_submissions') || '[]');
-        submissions.push(data);
-        localStorage.setItem('jiafutang_submissions', JSON.stringify(submissions));
-        
-        // 显示成功
-        document.getElementById('formContainer').style.display = 'none';
-        document.getElementById('successMessage').style.display = 'block';
+        processImages();
     });
+    
+    function toBase64(file) {
+        return new Promise((resolve, reject) => {
+            const reader = new FileReader();
+            reader.readAsDataURL(file);
+            reader.onload = () => resolve(reader.result);
+            reader.onerror = error => reject(error);
+        });
+    }
     </script>
     <script src="js/data.js"></script>
 </body>
