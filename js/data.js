@@ -17,7 +17,7 @@ const COLLECTION_STATUS = {
 };
 
 const NEWS_CATEGORIES = {
-    all: '全部', brand: '嘉孚堂动态', industry: '行业动态', policy: '政策法规', international: '国际资讯'
+    all: '全部', brand: '嘉孚堂动态', industry: '行业动态', international: '国际资讯'
 };
 
 // ============ 数据加载 ============
@@ -119,7 +119,7 @@ function createCollectionCard(item, showStatus = true) {
 }
 
 function createNewsCard(item) {
-    return '<div class="news-card" style="background:#fff;border-radius:12px;overflow:hidden;box-shadow:0 4px 20px rgba(0,0,0,0.08);transition:transform 0.3s;">' +
+    return '<div class="news-card" style="background:#fff;border-radius:12px;overflow:hidden;box-shadow:0 4px 20px rgba(0,0,0,0.08);transition:transform 0.3s;cursor:pointer;" onclick="window.location.href=\'news-detail.html?id=' + item.id + '\'">' +
         '<div style="aspect-ratio:16/9;overflow:hidden;">' +
         '<img src="' + item.cover_image + '" alt="' + item.title + '" style="width:100%;height:100%;object-fit:cover;">' +
         '</div>' +

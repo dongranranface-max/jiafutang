@@ -40,9 +40,10 @@
     <!-- Hero Section -->
     <section class="hero" id="hero">
         <div class="hero-slider" id="heroSlider">
-            <div class="hero-slide active" style="background-image: url('images/hero1.jpg')"></div>
-            <div class="hero-slide" style="background-image: url('images/hero2.jpg')"></div>
-            <div class="hero-slide" style="background-image: url('images/hero3.jpg')"></div>
+            <div class="hero-slide active" style="background-image: url('https://images.unsplash.com/photo-1569429594044-bcc5ad652a5e?w=1920&q=80')"></div>
+            <div class="hero-slide" style="background-image: url('https://images.unsplash.com/photo-1579783902614-a3fb3927b6a5?w=1920&q=80')"></div>
+            <div class="hero-slide" style="background-image: url('https://images.unsplash.com/photo-1578662996442-48f60103fc96?w=1920&q=80')"></div>
+            <div class="hero-slide" style="background-image: url('https://images.unsplash.com/photo-1519125323398-675f0ddb6308?w=1920&q=80')"></div>
         </div>
         <div class="hero-overlay"></div>
         <div class="hero-content">
@@ -57,6 +58,7 @@
             <span class="dot active" data-index="0"></span>
             <span class="dot" data-index="1"></span>
             <span class="dot" data-index="2"></span>
+            <span class="dot" data-index="3"></span>
         </div>
     </section>
 
@@ -118,11 +120,36 @@
     <section class="section process-section">
         <div class="container">
             <h2 class="section-title">服务流程</h2>
-            <p style="text-align:center;font-size:14px;color:#888;margin-bottom:10px;letter-spacing:1px;">
-                提交藏品 → 初步评估 → 专家鉴定 → 签订协议 → 宣传展示
-            </p>
-            <div class="process-cta">
-                <a href="submission.html" class="btn btn-primary">立即提交藏品</a>
+            <div style="display:flex;justify-content:center;align-items:flex-start;gap:0;flex-wrap:wrap;max-width:1200px;margin:0 auto 30px;position:relative;">
+                <div style="flex:1;min-width:140px;text-align:center;padding:30px 15px;position:relative;z-index:1;">
+                    <div style="width:70px;height:70px;background:linear-gradient(135deg,#B8860B,#D4A84B);color:#fff;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:28px;font-weight:bold;margin:0 auto 18px;box-shadow:0 8px 25px rgba(184,134,11,0.4);transition:all 0.3s;cursor:pointer;" onmouseover="this.style.transform='scale(1.1)';this.style.boxShadow='0 12px 35px rgba(184,134,11,0.6)'" onmouseout="this.style.transform='scale(1)';this.style.boxShadow='0 8px 25px rgba(184,134,11,0.4)'">1</div>
+                    <h4 style="font-size:17px;margin-bottom:10px;font-weight:600;color:#333;">提交藏品</h4>
+                    <p style="font-size:14px;color:#888;line-height:1.6;">联系提交藏品基本信息</p>
+                </div>
+                <div style="position:absolute;top:65px;left:12%;right:12%;height:3px;background:linear-gradient(90deg,#B8860B,#D4A84B,#B8860B);z-index:0;display:block;"></div>
+                <div style="flex:1;min-width:140px;text-align:center;padding:30px 15px;position:relative;z-index:1;">
+                    <div style="width:70px;height:70px;background:linear-gradient(135deg,#B8860B,#D4A84B);color:#fff;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:28px;font-weight:bold;margin:0 auto 18px;box-shadow:0 8px 25px rgba(184,134,11,0.4);transition:all 0.3s;cursor:pointer;" onmouseover="this.style.transform='scale(1.1)';this.style.boxShadow='0 12px 35px rgba(184,134,11,0.6)'" onmouseout="this.style.transform='scale(1)';this.style.boxShadow='0 8px 25px rgba(184,134,11,0.4)'">2</div>
+                    <h4 style="font-size:17px;margin-bottom:10px;font-weight:600;color:#333;">初步评估</h4>
+                    <p style="font-size:14px;color:#888;line-height:1.6;">专家团队进行价值评估</p>
+                </div>
+                <div style="flex:1;min-width:140px;text-align:center;padding:30px 15px;position:relative;z-index:1;">
+                    <div style="width:70px;height:70px;background:linear-gradient(135deg,#B8860B,#D4A84B);color:#fff;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:28px;font-weight:bold;margin:0 auto 18px;box-shadow:0 8px 25px rgba(184,134,11,0.4);transition:all 0.3s;cursor:pointer;" onmouseover="this.style.transform='scale(1.1)';this.style.boxShadow='0 12px 35px rgba(184,134,11,0.6)'" onmouseout="this.style.transform='scale(1)';this.style.boxShadow='0 8px 25px rgba(184,134,11,0.4)'">3</div>
+                    <h4 style="font-size:17px;margin-bottom:10px;font-weight:600;color:#333;">专家鉴定</h4>
+                    <p style="font-size:14px;color:#888;line-height:1.6;">专业机构真伪年代鉴定</p>
+                </div>
+                <div style="flex:1;min-width:140px;text-align:center;padding:30px 15px;position:relative;z-index:1;">
+                    <div style="width:70px;height:70px;background:linear-gradient(135deg,#B8860B,#D4A84B);color:#fff;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:28px;font-weight:bold;margin:0 auto 18px;box-shadow:0 8px 25px rgba(184,134,11,0.4);transition:all 0.3s;cursor:pointer;" onmouseover="this.style.transform='scale(1.1)';this.style.boxShadow='0 12px 35px rgba(184,134,11,0.6)'" onmouseout="this.style.transform='scale(1)';this.style.boxShadow='0 8px 25px rgba(184,134,11,0.4)'">4</div>
+                    <h4 style="font-size:17px;margin-bottom:10px;font-weight:600;color:#333;">签订协议</h4>
+                    <p style="font-size:14px;color:#888;line-height:1.6;">确认合作签订委托代理</p>
+                </div>
+                <div style="flex:1;min-width:140px;text-align:center;padding:30px 15px;position:relative;z-index:1;">
+                    <div style="width:70px;height:70px;background:linear-gradient(135deg,#B8860B,#D4A84B);color:#fff;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:28px;font-weight:bold;margin:0 auto 18px;box-shadow:0 8px 25px rgba(184,134,11,0.4);transition:all 0.3s;cursor:pointer;" onmouseover="this.style.transform='scale(1.1)';this.style.boxShadow='0 12px 35px rgba(184,134,11,0.6)'" onmouseout="this.style.transform='scale(1)';this.style.boxShadow='0 8px 25px rgba(184,134,11,0.4)'">5</div>
+                    <h4 style="font-size:17px;margin-bottom:10px;font-weight:600;color:#333;">宣传展示</h4>
+                    <p style="font-size:14px;color:#888;line-height:1.6;">全方位推广精准对接藏家</p>
+                </div>
+            </div>
+            <div style="text-align:center;">
+                <a href="submission.html" class="btn btn-primary">立即委托送拍</a>
             </div>
         </div>
     </section>
