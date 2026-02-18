@@ -3,64 +3,113 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>新闻管理 - 嘉孚堂后台管理系统</title>
+    <title>新闻管理 - 嘉孚堂后台</title>
     <link rel="stylesheet" href="../../css/style.css">
-    <link rel="stylesheet" href="../css/admin.css">
+    <style>
+        * { box-sizing: border-box; }
+        body { margin: 0; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: #f5f7fa; }
+        .admin-wrapper { display: flex; min-height: 100vh; }
+        .sidebar { width: 240px; background: linear-gradient(180deg, #1a1a2e 0%, #16213e 100%); color: #fff; padding: 0; position: fixed; height: 100vh; }
+        .sidebar-header { padding: 30px 20px; text-align: center; border-bottom: 1px solid rgba(255,255,255,0.1); }
+        .sidebar-header img { width: 60px; margin-bottom: 10px; }
+        .sidebar-header h2 { margin: 0; font-size: 18px; }
+        .sidebar-nav { padding: 20px 0; }
+        .nav-item { display: flex; align-items: center; padding: 15px 25px; color: rgba(255,255,255,0.7); text-decoration: none; transition: all 0.3s; }
+        .nav-item:hover, .nav-item.active { background: rgba(255,255,255,0.1); color: #fff; border-left: 3px solid #c9a962; }
+        .nav-item span:first-child { margin-right: 10px; font-size: 18px; }
+        .main-content { flex: 1; margin-left: 240px; padding: 30px; }
+        .page-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px; }
+        .page-header h1 { margin: 0; font-size: 28px; color: #1a1a2e; }
+        .btn { padding: 10px 20px; border: none; border-radius: 6px; cursor: pointer; font-size: 14px; transition: all 0.3s; }
+        .btn-primary { background: linear-gradient(135deg, #c9a962 0%, #a88b4c 100%); color: #fff; }
+        .btn-primary:hover { transform: translateY(-2px); box-shadow: 0 4px 15px rgba(201,169,98,0.4); }
+        .btn-danger { background: #ff4757; color: #fff; }
+        .btn-sm { padding: 8px 16px; font-size: 13px; }
+        .filter-bar { background: #fff; padding: 20px; border-radius: 10px; margin-bottom: 20px; display: flex; gap: 15px; flex-wrap: wrap; align-items: center; box-shadow: 0 2px 10px rgba(0,0,0,0.05); }
+        .filter-bar select, .filter-bar input { padding: 10px 15px; border: 1px solid #e0e0e0; border-radius: 6px; font-size: 14px; min-width: 150px; }
+        .filter-bar input { flex: 1; min-width: 200px; }
+        .table-wrapper { background: #fff; border-radius: 10px; overflow: hidden; box-shadow: 0 2px 10px rgba(0,0,0,0.05); }
+        .data-table { width: 100%; border-collapse: collapse; }
+        .data-table th { background: #f8f9fa; padding: 15px; text-align: left; font-weight: 600; color: #555; font-size: 13px; text-transform: uppercase; }
+        .data-table td { padding: 15px; border-bottom: 1px solid #f0f0f0; font-size: 14px; }
+        .data-table tr:hover { background: #fafafa; }
+        .status-tag { padding: 4px 10px; border-radius: 20px; font-size: 12px; }
+        .status-tag.brand { background: #e8f5e9; color: #2e7d32; }
+        .status-tag.industry { background: #e3f2fd; color: #1976d2; }
+        .status-tag.yes { background: #e8f5e9; color: #2e7d32; }
+        .status-tag.no { background: #ffebee; color: #c62828; }
+        .action-btns { display: flex; gap: 8px; }
+        .action-btn { padding: 6px 12px; border: none; border-radius: 4px; cursor: pointer; font-size: 12px; }
+        .edit-btn { background: #e3f2fd; color: #1976d2; }
+        .edit-btn:hover { background: #bbdefb; }
+        .delete-btn { background: #ffebee; color: #c62828; }
+        .delete-btn:hover { background: #ffcdd2; }
+        .batch-actions { display: none; padding: 15px 20px; background: #fff3e0; border-radius: 8px; margin-bottom: 15px; align-items: center; gap: 15px; }
+        .batch-actions.show { display: flex; }
+        .pagination { display: flex; justify-content: center; gap: 8px; margin-top: 20px; }
+        .page-btn { padding: 8px 14px; border: 1px solid #ddd; background: #fff; border-radius: 4px; cursor: pointer; }
+        .page-btn.active { background: #c9a962; color: #fff; border-color: #c9a962; }
+        .modal-overlay { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.5); display: none; justify-content: center; align-items: center; z-index: 1000; }
+        .modal-overlay.active { display: flex; }
+        .modal { background: #fff; border-radius: 12px; width: 90%; max-width: 600px; max-height: 90vh; overflow: auto; }
+        .modal-header { padding: 20px; border-bottom: 1px solid #eee; display: flex; justify-content: space-between; align-items: center; }
+        .modal-header h3 { margin: 0; font-size: 18px; }
+        .modal-close { background: none; border: none; font-size: 24px; cursor: pointer; color: #999; }
+        .modal-body { padding: 20px; }
+        .form-group { margin-bottom: 20px; }
+        .form-group label { display: block; margin-bottom: 8px; font-weight: 500; color: #333; }
+        .form-group input, .form-group select, .form-group textarea { width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 6px; font-size: 14px; }
+        .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; }
+        .form-actions { display: flex; gap: 10px; justify-content: flex-end; padding-top: 20px; }
+        .empty-state { text-align: center; padding: 60px; color: #999; }
+    </style>
 </head>
 <body>
     <div class="admin-wrapper">
-        <!-- 侧边栏 -->
         <aside class="sidebar">
             <div class="sidebar-header">
                 <img src="../../images/logo.png" alt="嘉孚堂">
                 <h2>后台管理</h2>
             </div>
             <nav class="sidebar-nav">
-                <a href="../dashboard.html" class="nav-item">
-                    <span>📊</span> <span>控制台</span>
-                </a>
-                <a href="collections.html" class="nav-item">
-                    <span>🎨</span> <span>藏品管理</span>
-                </a>
-                <a href="news.html" class="nav-item active">
-                    <span>📰</span> <span>新闻管理</span>
-                </a>
-                <a href="submissions.html" class="nav-item">
-                    <span>📋</span> <span>提交记录</span>
-                </a>
-                <a href="#" onclick="logout(); return false;" class="nav-item">
-                    <span>🚪</span> <span>退出登录</span>
-                </a>
+                <a href="../dashboard.html" class="nav-item"><span>📊</span><span>控制台</span></a>
+                <a href="collections.html" class="nav-item"><span>🎨</span><span>藏品管理</span></a>
+                <a href="news.html" class="nav-item active"><span>📰</span><span>新闻管理</span></a>
+                <a href="submissions.html" class="nav-item"><span>📋</span><span>提交记录</span></a>
+                <a href="#" onclick="logout()" class="nav-item"><span>🚪</span><span>退出登录</span></a>
             </nav>
         </aside>
 
-        <!-- 主内容 -->
         <main class="main-content">
             <div class="page-header">
-                <h1>新闻管理</h1>
-                <button class="btn-sm btn-view" onclick="openModal()">+ 添加新闻</button>
+                <h1>📰 新闻管理</h1>
+                <button class="btn btn-primary" onclick="openModal()">+ 添加新闻</button>
             </div>
 
-            <!-- 筛选 -->
+            <div class="batch-actions" id="batchActions">
+                <span>已选择 <strong id="selectedCount">0</strong> 项</span>
+                <button class="btn btn-danger btn-sm" onclick="batchDelete()">批量删除</button>
+                <button class="btn btn-sm" onclick="clearSelection()">取消选择</button>
+            </div>
+
             <div class="filter-bar">
                 <select id="filterCategory" onchange="renderTable()">
                     <option value="">全部分类</option>
                     <option value="brand">嘉孚堂动态</option>
                     <option value="industry">行业动态</option>
                 </select>
-                <input type="text" id="searchKeyword" placeholder="搜索新闻..." oninput="renderTable()">
+                <input type="text" id="searchKeyword" placeholder="🔍 搜索新闻标题..." oninput="renderTable()">
             </div>
 
-            <!-- 表格 -->
             <div class="table-wrapper">
                 <table class="data-table">
                     <thead>
                         <tr>
+                            <th style="width:40px;"><input type="checkbox" id="selectAll" onchange="toggleSelectAll()"></th>
                             <th>编号</th>
                             <th>标题</th>
                             <th>分类</th>
-                            <th>发布时间</th>
-                            <th>置顶</th>
+                            <th>推荐</th>
                             <th>操作</th>
                         </tr>
                     </thead>
@@ -69,25 +118,22 @@
                 </table>
             </div>
 
-            <!-- 分页 -->
-            <div class="pagination" id="pagination">
-            </div>
+            <div class="pagination" id="pagination"></div>
         </main>
     </div>
 
-    <!-- 添加/编辑弹窗 -->
     <div class="modal-overlay" id="newsModal">
         <div class="modal">
             <div class="modal-header">
                 <h3 id="modalTitle">添加新闻</h3>
-                <button class="modal-close" onclick="closeModal()">&times;</button>
+                <button class="modal-close" onclick="closeModal()">×</button>
             </div>
             <div class="modal-body">
                 <form id="newsForm">
                     <input type="hidden" id="newsId">
                     <div class="form-group">
-                        <label>标题 *</label>
-                        <input type="text" id="newsTitle" required>
+                        <label>新闻标题 *</label>
+                        <input type="text" id="newsTitle" required placeholder="请输入新闻标题">
                     </div>
                     <div class="form-row">
                         <div class="form-group">
@@ -99,7 +145,7 @@
                             </select>
                         </div>
                         <div class="form-group">
-                            <label>首页置顶</label>
+                            <label>首页推荐</label>
                             <select id="newsTop">
                                 <option value="false">否</option>
                                 <option value="true">是</option>
@@ -107,200 +153,232 @@
                         </div>
                     </div>
                     <div class="form-group">
-                        <label>封面图片URL</label>
-                        <input type="text" id="newsCoverImage" placeholder="https://...">
+                        <label>封面图片（上传或输入URL）</label>
+                        <input type="file" id="newsImageFile" accept="image/*" onchange="previewImage(this)">
+                        <div id="imagePreview" style="margin-top:10px;display:none;">
+                            <img id="previewImg" style="max-width:200px;border-radius:4px;">
+                        </div>
+                        <input type="text" id="newsCoverImage" placeholder="图片URL，也可手动输入" style="margin-top:10px;">
                     </div>
                     <div class="form-group">
                         <label>摘要</label>
-                        <textarea id="newsSummary" placeholder="简短摘要..."></textarea>
+                        <textarea id="newsSummary" rows="2" placeholder="简短描述..."></textarea>
                     </div>
                     <div class="form-group">
-                        <label>正文内容 (HTML)</label>
-                        <textarea id="newsContent" style="min-height: 150px;" placeholder="<p>正文内容...</p>"></textarea>
+                        <label>详细内容</label>
+                        <textarea id="newsContent" rows="6" placeholder="详细内容..."></textarea>
                     </div>
                     <div class="form-actions">
-                        <button type="button" class="btn-cancel" onclick="closeModal()">取消</button>
-                        <button type="button" class="btn-save" onclick="saveNews()">保存</button>
+                        <button type="button" class="btn" onclick="closeModal()">取消</button>
+                        <button type="button" class="btn btn-primary" onclick="saveNews()">保存</button>
                     </div>
                 </form>
             </div>
         </div>
     </div>
 
-    <script src="../js/auth.js"></script>
     <script>
-        let newsList = [];
-        let currentPage = 1;
-        const pageSize = 10;
-        
-        // 存储键名
-        const STORAGE_KEY = 'jiafu_news';
-        
-        // 初始化
-        function init() {
-            loadNews();
-        }
-        
-        // 加载新闻数据 - 优先从localStorage
-        function loadNews() {
-            const stored = localStorage.getItem(STORAGE_KEY);
-            if (stored) {
-                try {
-                    newsList = JSON.parse(stored);
-                } catch(e) {
-                    newsList = getDefaultNews();
-                }
-            } else {
-                newsList = getDefaultNews();
-                saveToStorage();
-            }
-            renderTable();
-        }
-        
-        // 默认数据
-        function getDefaultNews() {
-            return [
-                {id:1,title:'2026年春季艺术品拍卖会圆满落幕',category:'brand',coverImage:'https://images.unsplash.com/photo-1518998053901-5348d3961a04?w=600',summary:'成交总额突破5亿元',isTop:true,sort:1},
-                {id:2,title:'收藏市场持续升温',category:'industry',coverImage:'https://images.unsplash.com/photo-1578926288207-a90a5366759d?w=600',summary:'市场持续升温',isTop:false,sort:2},
-                {id:3,title:'嘉孚堂开通线上藏品征集服务',category:'brand',coverImage:'https://images.unsplash.com/photo-1621155346337-1d19476ba7d6?w=600',summary:'开通服务',isTop:false,sort:3}
-            ];
-        }
-        
-        // 保存到localStorage
-        function saveToStorage() {
-            localStorage.setItem(STORAGE_KEY, JSON.stringify(newsList));
-        }
-        
-        // 渲染表格
-        function renderTable() {
-            const category = document.getElementById('filterCategory').value;
-            const keyword = document.getElementById('searchKeyword').value;
-            
-            let filtered = [...newsList];
-            
-            if (category) filtered = filtered.filter(n => n.category === category);
-            if (keyword) filtered = filtered.filter(n => n.title.includes(keyword) || n.summary.includes(keyword));
-            
-            filtered.sort((a, b) => b.sort - a.sort);
-            
-            const totalPages = Math.ceil(filtered.length / pageSize);
-            const start = (currentPage - 1) * pageSize;
-            const paged = filtered.slice(start, start + pageSize);
-            
-            const tbody = document.getElementById('newsTable');
-            if (paged.length === 0) {
-                tbody.innerHTML = '<tr><td colspan="6" class="empty-state">暂无数据</td></tr>';
-            } else {
-                tbody.innerHTML = paged.map(n => `
-                    <tr>
-                        <td>${n.sort}</td>
-                        <td>${n.title}</td>
-                        <td>${n.category === 'brand' ? '嘉孚堂动态' : '行业动态'}</td>
-                        <td>${new Date().toLocaleDateString()}</td>
-                        <td>${n.isTop ? '✅' : '❌'}</td>
-                        <td>
-                            <button class="btn-sm" onclick="editNews(${n.id})">编辑</button>
-                            <button class="btn-sm btn-danger" onclick="deleteNews(${n.id})">删除</button>
-                        </td>
-                    </tr>
-                `).join('');
-            }
-            
-            // 分页
-            const pagination = document.getElementById('pagination');
-            if (totalPages > 1) {
-                let html = '';
-                for (let i = 1; i <= totalPages; i++) {
-                    html += `<button class="${i === currentPage ? 'active' : ''}" onclick="goPage(${i})">${i}</button>`;
-                }
-                pagination.innerHTML = html;
-            } else {
-                pagination.innerHTML = '';
-            }
-        }
-        
-        function goPage(page) {
-            currentPage = page;
-            renderTable();
-        }
-        
-        // 打开弹窗
-        function openModal(id = null) {
-            const modal = document.getElementById('newsModal');
-            const title = document.getElementById('modalTitle');
-            
-            if (id) {
-                const item = newsList.find(n => n.id === id);
-                if (item) {
-                    title.textContent = '编辑新闻';
-                    document.getElementById('newsId').value = item.id;
-                    document.getElementById('newsTitle').value = item.title;
-                    document.getElementById('newsCategory').value = item.category;
-                    document.getElementById('newsTop').value = item.isTop ? 'true' : 'false';
-                    document.getElementById('newsCoverImage').value = item.coverImage || '';
-                    document.getElementById('newsSummary').value = item.summary || '';
-                    document.getElementById('newsContent').value = item.content || '';
-                }
-            } else {
-                title.textContent = '添加新闻';
-                document.getElementById('newsForm').reset();
-                document.getElementById('newsId').value = '';
-            }
-            
-            modal.classList.add('active');
-        }
-        
-        function closeModal() {
-            document.getElementById('newsModal').classList.remove('active');
-        }
-        
-        // 保存新闻
-        function saveNews() {
-            const id = document.getElementById('newsId').value;
-            const data = {
-                title: document.getElementById('newsTitle').value,
-                category: document.getElementById('newsCategory').value,
-                isTop: document.getElementById('newsTop').value === 'true',
-                coverImage: document.getElementById('newsCoverImage').value,
-                summary: document.getElementById('newsSummary').value,
-                content: document.getElementById('newsContent').value
-            };
-            
-            if (!data.title || !data.category) {
-                alert('请填写必填项');
-                return;
-            }
-            
-            if (id) {
-                const index = newsList.findIndex(n => n.id === parseInt(id));
-                newsList[index] = { ...newsList[index], ...data };
-            } else {
-                const newId = newsList.length > 0 ? Math.max(...newsList.map(n => n.id)) + 1 : 1;
-                newsList.push({ id: newId, sort: newId, ...data });
-            }
-            
-            saveToStorage();
-            closeModal();
-            renderTable();
-            alert('保存成功！');
-        }
-        
-        // 编辑新闻
-        function editNews(id) {
-            openModal(id);
-        }
-        
-        // 删除新闻
-        function deleteNews(id) {
-            if (confirm('确定要删除这条新闻吗？')) {
-                newsList = newsList.filter(n => n.id !== id);
-                saveToStorage();
+    const API_URL = 'https://jiafutang-api.dongranranface.workers.dev';
+    let newsList = [];
+    let currentPage = 1;
+    const pageSize = 10;
+    let selectedIds = [];
+
+    function init() { loadNews(); }
+
+    function loadNews() {
+        fetch(API_URL + '/api/news')
+            .then(res => res.json())
+            .then(data => {
+                newsList = data || [];
                 renderTable();
+            });
+    }
+
+    function renderTable() {
+        const category = document.getElementById('filterCategory').value;
+        const keyword = document.getElementById('searchKeyword').value.toLowerCase();
+        
+        let filtered = newsList.filter(n => {
+            if (category && n.category !== category) return false;
+            if (keyword && !n.title.toLowerCase().includes(keyword)) return false;
+            return true;
+        });
+        
+        filtered.sort((a,b) => b.sort - a.sort);
+        
+        const totalPages = Math.ceil(filtered.length / pageSize);
+        const start = (currentPage - 1) * pageSize;
+        const paged = filtered.slice(start, start + pageSize);
+        
+        const categoryMap = {brand:'嘉孚堂动态',industry:'行业动态'};
+        
+        const tbody = document.getElementById('newsTable');
+        if (paged.length === 0) {
+            tbody.innerHTML = '<tr><td colspan="6" class="empty-state">暂无数据</td></tr>';
+        } else {
+            tbody.innerHTML = paged.map(n => {
+                const isSelected = selectedIds.includes(n.id);
+                return '<tr>' +
+                    '<td><input type="checkbox" ' + (isSelected ? 'checked' : '') + ' onchange="toggleSelect(' + n.id + ')"></td>' +
+                    '<td>' + n.id + '</td>' +
+                    '<td><strong>' + n.title + '</strong></td>' +
+                    '<td><span class="status-tag ' + n.category + '">' + categoryMap[n.category] + '</span></td>' +
+                    '<td><span class="status-tag ' + (n.is_top ? 'yes' : 'no') + '">' + (n.is_top ? '✓' : '✗') + '</span></td>' +
+                    '<td><div class="action-btns">' +
+                    '<button class="action-btn edit-btn" onclick="editNews(' + n.id + ')">编辑</button>' +
+                    '<button class="action-btn delete-btn" onclick="deleteNews(' + n.id + ')">删除</button></div></td>' +
+                '</tr>';
+            }).join('');
+        }
+        
+        updateBatchActions();
+        renderPagination(totalPages);
+    }
+
+    function renderPagination(totalPages) {
+        if (totalPages <= 1) { document.getElementById('pagination').innerHTML = ''; return; }
+        let html = '';
+        for (let i = 1; i <= totalPages; i++) {
+            html += '<button class="page-btn' + (i === currentPage ? ' active' : '') + '" onclick="goPage(' + i + ')">' + i + '</button>';
+        }
+        document.getElementById('pagination').innerHTML = html;
+    }
+
+    function goPage(page) { currentPage = page; renderTable(); }
+
+    function toggleSelectAll() {
+        const checked = document.getElementById('selectAll').checked;
+        selectedIds = checked ? newsList.map(n => n.id) : [];
+        renderTable();
+    }
+
+    function toggleSelect(id) {
+        if (selectedIds.includes(id)) selectedIds = selectedIds.filter(i => i !== id);
+        else selectedIds.push(id);
+        renderTable();
+    }
+
+    function updateBatchActions() {
+        document.getElementById('batchActions').classList.toggle('show', selectedIds.length > 0);
+        document.getElementById('selectedCount').textContent = selectedIds.length;
+    }
+
+    function clearSelection() { selectedIds = []; renderTable(); }
+
+    function batchDelete() {
+        if (!confirm('确定要删除选中的 ' + selectedIds.length + ' 条新闻吗？')) return;
+        Promise.all(selectedIds.map(id => fetch(API_URL + '/api/news/' + id, {method:'DELETE'}).then(r=>r.json())))
+        .then(() => { selectedIds = []; loadNews(); alert('批量删除成功！'); });
+    }
+
+    function openModal(id) {
+        document.getElementById('newsModal').classList.add('active');
+        document.getElementById('modalTitle').textContent = id ? '编辑新闻' : '添加新闻';
+        document.getElementById('newsId').value = id || '';
+        document.getElementById('newsForm').reset();
+        document.getElementById('imagePreview').style.display = 'none';
+        
+        if (id) {
+            const n = newsList.find(x => x.id === id);
+            if (n) {
+                document.getElementById('newsTitle').value = n.title || '';
+                document.getElementById('newsCategory').value = n.category || '';
+                document.getElementById('newsTop').value = n.is_top ? 'true' : 'false';
+                document.getElementById('newsCoverImage').value = n.cover_image || '';
+                document.getElementById('newsSummary').value = n.summary || '';
+                document.getElementById('newsContent').value = n.content || '';
+                if (n.cover_image) {
+                    document.getElementById('previewImg').src = n.cover_image;
+                    document.getElementById('imagePreview').style.display = 'block';
+                }
+            }
+        }
+    }
+
+    // 图片预览
+    function previewImage(input) {
+        if (input.files && input.files[0]) {
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                document.getElementById('previewImg').src = e.target.result;
+                document.getElementById('imagePreview').style.display = 'block';
+                document.getElementById('newsCoverImage').value = e.target.result;
+            };
+            reader.readAsDataURL(input.files[0]);
+        }
+    }
+
+    // 上传图片到Cloudinary
+    async function uploadImage(file) {
+        return new Promise((resolve, reject) => {
+            const reader = new FileReader();
+            reader.onload = async function(e) {
+                try {
+                    const formData = new FormData();
+                    formData.append('file', e.target.result);
+                    formData.append('upload_preset', 'ml_default');
+                    
+                    const res = await fetch('https://api.cloudinary.com/v1_1/dongranranface/image/upload', {method: 'POST', body: formData});
+                    const data = await res.json();
+                    if (data.secure_url) {
+                        resolve(data.secure_url);
+                    } else {
+                        reject(new Error('Upload failed'));
+                    }
+                } catch(err) {
+                    reject(err);
+                }
+            };
+            reader.onerror = reject;
+            reader.readAsDataURL(file);
+        });
+    }
+
+    function closeModal() { document.getElementById('newsModal').classList.remove('active'); }
+    function editNews(id) { openModal(id); }
+
+    async function saveNews() {
+        const id = document.getElementById('newsId').value;
+        const fileInput = document.getElementById('newsImageFile');
+        let coverImage = document.getElementById('newsCoverImage').value;
+        
+        if (fileInput.files && fileInput.files[0]) {
+            try {
+                coverImage = await uploadImage(fileInput.files[0]);
+            } catch(e) {
+                alert('图片上传失败，将使用输入的URL');
             }
         }
         
-        // 初始化
-        init();
+        const data = {
+            title: document.getElementById('newsTitle').value,
+            category: document.getElementById('newsCategory').value,
+            is_top: document.getElementById('newsTop').value === 'true',
+            cover_image: coverImage || 'https://images.unsplash.com/photo-1578926288207-a90a5366759d?w=400',
+            summary: document.getElementById('newsSummary').value,
+            content: document.getElementById('newsContent').value,
+            sort: id ? parseInt(id) : (newsList.length + 1)
+        };
+        
+        if (!data.title || !data.category) { alert('请填写必填项'); return; }
+        
+        const method = id ? 'PUT' : 'POST';
+        const url = id ? API_URL + '/api/news/' + id : API_URL + '/api/news';
+        
+        fetch(url, {method: method, headers: {'Content-Type':'application/json'}, body: JSON.stringify(data)})
+            .then(res => res.json()).then(result => { closeModal(); loadNews(); alert('保存成功！'); });
+    }
+
+    function deleteNews(id) {
+        if (!confirm('确定要删除这条新闻吗？')) return;
+        fetch(API_URL + '/api/news/' + id, {method:'DELETE'})
+            .then(res => res.json()).then(() => { loadNews(); alert('删除成功！'); });
+    }
+
+    function logout() { window.location.href = '../index.html'; }
+
+    init();
     </script>
 </body>
 </html>

@@ -27,7 +27,7 @@
 })();
 
 document.addEventListener('DOMContentLoaded', function() {
-    // 立即初始化基础功能
+    // 基础功能初始化
     initHeader();
     initHeroSlider();
     initScrollAnimations();
@@ -35,22 +35,10 @@ document.addEventListener('DOMContentLoaded', function() {
     initSearch();
     initStatsAnimation();
     
-    // 页面特定功能 - 加载数据
-    if (document.getElementById('featuredGrid')) {
-        loadFeaturedCollections();
-    }
-    if (document.getElementById('homeNewsGrid')) {
-        loadHomeNews();
-    }
+    // 只初始化表单，不加载数据（数据由 data.js 负责）
     if (document.getElementById('submissionForm')) {
         initSubmissionForm();
     }
-    
-    // 延迟一下再刷新，确保数据已加载
-    setTimeout(function() {
-        if (document.getElementById('featuredGrid')) refreshCollections();
-        if (document.getElementById('homeNewsGrid')) refreshNews();
-    }, 500);
 });
 
 // 刷新藏品展示
@@ -249,7 +237,14 @@ function loadFeaturedCollections(category = 'all', keyword = '') {
     const grid = document.getElementById('featuredGrid');
     if (!grid) return;
     
-    let filtered = collections.filter(item => item.isFeatured);
+    // 如果数据为空，显示加载中
+    if (!collections || collections.length === 0) {
+        grid.innerHTML = '<p style="text-align:center;padding:40px;">加载中...</p>';
+        return;
+    }
+    
+    // 首页每个分类最多显示4个藏品 - is_featured 可能是 1/0 或 true/false
+    let filtered = collections.filter(item => item.is_featured === 1 || item.is_featured === true);
     
     if (category !== 'all') {
         filtered = filtered.filter(item => item.category === category);
@@ -258,11 +253,13 @@ function loadFeaturedCollections(category = 'all', keyword = '') {
     if (keyword) {
         filtered = filtered.filter(item => 
             item.title.includes(keyword) || 
-            item.summary.includes(keyword)
+            (item.summary && item.summary.includes(keyword))
         );
     }
     
-    grid.innerHTML = filtered.slice(0, 8).map(item => createCollectionCard(item)).join('');
+    // 排序并限制每个分类最多4个
+    filtered.sort((a, b) => b.sort - a.sort);
+    grid.innerHTML = filtered.slice(0, 4).map(item => createCollectionCard(item)).join('');
     
     // 添加点击事件跳转到详情页
     grid.querySelectorAll('.collection-card').forEach((card, index) => {
@@ -279,13 +276,22 @@ function loadHomeNews(category = 'all') {
     const grid = document.getElementById('homeNewsGrid');
     if (!grid) return;
     
+    // 如果数据为空，显示加载中
+    if (!news || news.length === 0) {
+        grid.innerHTML = '<p style="text-align:center;padding:40px;">加载中...</p>';
+        return;
+    }
+    
+    // 首页每个分类最多显示4条新闻
     let filtered = news;
     
     if (category !== 'all') {
         filtered = filtered.filter(item => item.category === category);
     }
     
-    grid.innerHTML = filtered.slice(0, 6).map(item => createNewsCard(item)).join('');
+    // 排序并限制每个分类最多4条
+    filtered.sort((a, b) => b.sort - a.sort);
+    grid.innerHTML = filtered.slice(0, 4).map(item => createNewsCard(item)).join('');
     
     // 添加点击事件
     grid.querySelectorAll('.news-card').forEach((card, index) => {
@@ -301,11 +307,13 @@ function loadHomeNews(category = 'all') {
 function createCollectionCard(item) {
     const statusText = COLLECTION_STATUS[item.status];
     const categoryText = COLLECTION_CATEGORIES[item.category];
+    const coverImage = item.cover_image || item.coverImage || '';
+    const summary = item.summary || '';
     
     return `
         <div class="collection-card fade-in">
             <div class="card-image">
-                <img src="${item.coverImage}" alt="${item.title}" loading="lazy">
+                <img src="${coverImage}" alt="${item.title}" loading="lazy">
                 <span class="card-status ${item.status}">${statusText}</span>
             </div>
             <div class="card-content">
@@ -313,7 +321,7 @@ function createCollectionCard(item) {
                 <p class="card-meta">
                     <span class="card-category">${categoryText}</span>
                     <span> · </span>
-                    <span>${item.summary.substring(0, 20)}...</span>
+                    <span>${summary.substring(0, 20)}...</span>
                 </p>
             </div>
         </div>
@@ -325,17 +333,19 @@ function createCollectionCard(item) {
 // ===================================
 function createNewsCard(item) {
     const categoryText = NEWS_CATEGORIES[item.category];
-    const date = new Date(item.publishAt).toLocaleDateString('zh-CN');
+    const coverImage = item.cover_image || item.coverImage || '';
+    const publishDate = item.publish_date || item.publishAt || item.created_at || new Date().toISOString();
+    const date = new Date(publishDate).toLocaleDateString('zh-CN');
     
     return `
         <div class="news-card fade-in">
             <div class="news-image">
-                <img src="${item.coverImage}" alt="${item.title}" loading="lazy">
+                <img src="${coverImage}" alt="${item.title}" loading="lazy">
             </div>
             <div class="news-content">
                 <span class="news-category">${categoryText}</span>
                 <h3 class="news-title">${item.title}</h3>
-                <p class="news-summary">${item.summary}</p>
+                <p class="news-summary">${item.summary || ''}</p>
                 <span class="news-date">${date}</span>
             </div>
         </div>
@@ -450,6 +460,21 @@ function loadCollections(category = 'all', status = 'all', keyword = '', page = 
     const grid = document.getElementById('collectionGrid');
     if (!grid) return;
     
+    // 如果数据为空，尝试重新加载
+    if (!collections || collections.length === 0) {
+        grid.innerHTML = '<p style="text-align:center;padding:40px;">加载中...</p>';
+        // 重新获取数据
+        fetch(API_URL + '/api/collections')
+        .then(res => res.json())
+        .then(data => {
+            if (data && data.length > 0) {
+                collections = data;
+                loadCollections(category, status, keyword, page, pageSize);
+            }
+        });
+        return;
+    }
+    
     let filtered = [...collections];
     
     if (category !== 'all') {
@@ -463,9 +488,12 @@ function loadCollections(category = 'all', status = 'all', keyword = '', page = 
     if (keyword) {
         filtered = filtered.filter(item => 
             item.title.includes(keyword) || 
-            item.summary.includes(keyword)
+            (item.summary && item.summary.includes(keyword))
         );
     }
+    
+    // 排序
+    filtered.sort((a, b) => b.sort - a.sort);
     
     // 分页
     const totalPages = Math.ceil(filtered.length / pageSize);
@@ -505,8 +533,8 @@ function loadNews(category = 'all', keyword = '', page = 1, pageSize = 9) {
         );
     }
     
-    // 按发布时间排序
-    filtered.sort((a, b) => new Date(b.publishAt) - new Date(a.publishAt));
+    // 按 sort 字段排序（降序）
+    filtered.sort((a, b) => (b.sort || 0) - (a.sort || 0));
     
     // 分页
     const totalPages = Math.ceil(filtered.length / pageSize);

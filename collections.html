@@ -5,13 +5,17 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>藏品展示 - 嘉孚堂</title>
     <meta name="description" content="嘉孚堂藏品展示，艺术品、古董文物、珠宝奢侈品等">
+    <meta property="og:title" content="藏品展示 - 嘉孚堂">
+    <meta property="og:description" content="嘉孚堂藏品展示，艺术品、古董文物、珠宝奢侈品等">
+    <meta property="og:image" content="https://jiafutang.pages.dev/images/logo.png">
+    <meta property="og:type" content="website">
     <link rel="stylesheet" href="css/style.css">
     <link rel="icon" type="image/x-icon" href="favicon.ico">
     <link rel="apple-touch-icon" href="favicon.ico">
 </head>
 <body>
     <!-- Header -->
-    <header class="header scrolled" id="header">
+    <header class="header" id="header">
         <div class="container header-inner">
             <a href="index.html" class="logo">
                 <img src="images/logo.png" alt="嘉孚堂" class="logo-img">
@@ -69,9 +73,7 @@
     <!-- Collections Grid -->
     <section class="section">
         <div class="container">
-            <div class="featured-grid" id="collectionGrid">
-                <!-- 藏品卡片将通过JS动态生成 -->
-            </div>
+            <div class="featured-grid" id="collectionGrid"></div>
             <div class="pagination" id="pagination"></div>
         </div>
     </section>
@@ -104,50 +106,5 @@
     </footer>
 
     <script src="js/data.js"></script>
-    <script src="js/main.js"></script>
-    <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            // 初始化Filter Tabs
-            initCollectionFilter();
-            
-            // 加载藏品列表
-            loadCollections();
-        });
-        
-        function initCollectionFilter() {
-            // 分类Tab
-            const filterBtns = document.querySelectorAll('.filter-tabs .filter-btn');
-            filterBtns.forEach(btn => {
-                btn.addEventListener('click', function() {
-                    filterBtns.forEach(b => b.classList.remove('active'));
-                    this.classList.add('active');
-                    loadCollections();
-                });
-            });
-            
-            // 状态筛选
-            const statusBtns = document.querySelectorAll('.filter-status .filter-btn');
-            statusBtns.forEach(btn => {
-                btn.addEventListener('click', function() {
-                    statusBtns.forEach(b => b.classList.remove('active'));
-                    this.classList.add('active');
-                    loadCollections();
-                });
-            });
-            
-            // 搜索
-            const searchBtn = document.getElementById('collectionSearchBtn');
-            const searchInput = document.getElementById('collectionSearchInput');
-            
-            if (searchBtn) {
-                searchBtn.addEventListener('click', loadCollections);
-            }
-            if (searchInput) {
-                searchInput.addEventListener('keypress', function(e) {
-                    if (e.key === 'Enter') loadCollections();
-                });
-            }
-        }
-    </script>
 </body>
 </html>

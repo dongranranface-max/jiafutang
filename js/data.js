@@ -1,111 +1,365 @@
 // ===================================
-// 嘉孚堂官网 - 数据配置
+// 嘉孚堂官网 - 完整脚本
 // ===================================
 
-// 藏品分类
-const COLLECTION_CATEGORIES = {
-    all: '全部',
-    art: '艺术品',
-    antique: '古董文物',
-    jewelry: '珠宝奢侈品',
-    coin: '文献邮币',
-    nft: '数字藏品',
-    misc: '杂项'
-};
+const API_URL = 'https://jiafutang-api.dongranranface.workers.dev';
 
-// 藏品状态
-const COLLECTION_STATUS = {
-    sold: '已拍卖',
-    unsold: '未拍卖',
-    coming: '即将拍卖'
-};
-
-// 藏品数据
 var collections = [];
 var news = [];
 
-// 页面加载时获取数据 - 从localStorage读取
-(function loadData() {
-    // 从 localStorage 读取
-    const storedCollections = localStorage.getItem('jiafu_collections');
-    const storedNews = localStorage.getItem('jiafu_news');
-    
-    if (storedCollections) {
-        try {
-            window.collections = JSON.parse(storedCollections);
-        } catch(e) {
-            window.collections = getDefaultCollections();
-        }
-    } else {
-        window.collections = getDefaultCollections();
-    }
-    
-    if (storedNews) {
-        try {
-            window.news = JSON.parse(storedNews);
-        } catch(e) {
-            window.news = getDefaultNews();
-        }
-    } else {
-        window.news = getDefaultNews();
-    }
-    
-    console.log('Loaded from localStorage:', window.collections.length, 'collections,', window.news.length, 'news');
-    
-    // 延迟刷新页面
-    setTimeout(function() {
-        if (typeof refreshCollections === 'function') refreshCollections();
-        if (typeof refreshNews === 'function') refreshNews();
-    }, 100);
-})();
-
-// 全局变量引用（兼容）
-var collections = window.collections || [];
-var news = window.news || [];
-
-function getDefaultCollections() {
-    return [
-        {id:1,title:'清代紫檀木雕福禄寿屏风',category:'antique',status:'sold',coverImage:'https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=400',summary:'清代晚期紫檀木雕',isFeatured:true,sort:1},
-        {id:2,title:'民国粉彩人物故事瓶',category:'antique',status:'coming',coverImage:'https://images.unsplash.com/photo-1565193566173-7a0ee3dbe261?w=400',summary:'民国粉彩名品',isFeatured:true,sort:2},
-        {id:3,title:'明式黄花梨官帽椅',category:'antique',status:'sold',coverImage:'https://images.unsplash.com/photo-1506439773649-6e0eb8cfb237?w=400',summary:'明式家具',isFeatured:false,sort:3},
-        {id:4,title:'宋代建窑兔毫盏',category:'antique',status:'sold',coverImage:'https://images.unsplash.com/photo-1544787219-7f47ccb76574?w=400',summary:'宋代建窑',isFeatured:false,sort:4},
-        {id:5,title:'齐白石《虾趣图》',category:'art',status:'sold',coverImage:'https://images.unsplash.com/photo-1578926288207-a90a5366759d?w=400',summary:'齐白石精品',isFeatured:true,sort:5},
-        {id:6,title:'张大千《山水四条屏》',category:'art',status:'unsold',coverImage:'https://images.unsplash.com/photo-1605883705077-8d3d3cebe78c?w=400',summary:'张大千山水',isFeatured:true,sort:6},
-        {id:7,title:'傅抱石《山水长卷》',category:'art',status:'coming',coverImage:'https://images.unsplash.com/photo-1600636567129-674c947c29b7?w=400',summary:'傅抱石力作',isFeatured:false,sort:7},
-        {id:8,title:'徐悲鸿《奔马图》',category:'art',status:'unsold',coverImage:'https://images.unsplash.com/photo-1518998053901-5348d3961a04?w=400',summary:'徐悲鸿代表作',isFeatured:false,sort:8},
-        {id:9,title:'卡地亚钻石胸针',category:'jewelry',status:'unsold',coverImage:'https://images.unsplash.com/photo-1515562141207-7a88fb7ce338?w=400',summary:'卡地亚',isFeatured:true,sort:9},
-        {id:10,title:'翡翠手镯 玻璃种',category:'jewelry',status:'coming',coverImage:'https://images.unsplash.com/photo-1602751584552-8ba73aad10e1?w=400',summary:'玻璃种翡翠',isFeatured:true,sort:10},
-        {id:11,title:'梵克雅宝钻石项链',category:'jewelry',status:'sold',coverImage:'https://images.unsplash.com/photo-1599643478518-a784e5dc4c8f?w=400',summary:'梵克雅宝',isFeatured:false,sort:11},
-        {id:12,title:'红宝石戒指',category:'jewelry',status:'unsold',coverImage:'https://images.unsplash.com/photo-1605100804763-247f67b3557e?w=400',summary:'鸽血红宝石',isFeatured:false,sort:12},
-        {id:13,title:'第一版人民币全套',category:'coin',status:'sold',coverImage:'https://images.unsplash.com/photo-1621155346337-1d19476ba7d6?w=400',summary:'第一版人民币',isFeatured:true,sort:13},
-        {id:14,title:'文革时期珍邮票',category:'coin',status:'unsold',coverImage:'https://images.unsplash.com/photo-1580196929935-77f7a7a8e389?w=400',summary:'文革邮票',isFeatured:false,sort:14},
-        {id:15,title:'袁大头银元',category:'coin',status:'coming',coverImage:'https://images.unsplash.com/photo-1610375461246-83df859d849d?w=400',summary:'袁大头',isFeatured:false,sort:15},
-        {id:16,title:'古钱币一组',category:'coin',status:'unsold',coverImage:'https://images.unsplash.com/photo-1571752726703-5e7d1f6a986d?w=400',summary:'古钱币',isFeatured:false,sort:16},
-        {id:17,title:'NFT《创世之境》',category:'nft',status:'coming',coverImage:'https://images.unsplash.com/photo-1642104704074-907c0698cbd9?w=400',summary:'数字艺术品',isFeatured:true,sort:17},
-        {id:18,title:'NFT《星际幻想》',category:'nft',status:'unsold',coverImage:'https://images.unsplash.com/photo-1620641788421-7a1c342ea42e?w=400',summary:'限量版NFT',isFeatured:false,sort:18},
-        {id:19,title:'NFT《赛博朋克》',category:'nft',status:'sold',coverImage:'https://images.unsplash.com/photo-1634152962476-4b8a00e1915c?w=400',summary:'赛博朋克',isFeatured:false,sort:19},
-        {id:20,title:'NFT《抽象艺术》',category:'nft',status:'unsold',coverImage:'https://images.unsplash.com/photo-1618005198919-d3d4b5a92ead?w=400',summary:'抽象NFT',isFeatured:false,sort:20},
-        {id:21,title:'19世纪西洋座钟',category:'misc',status:'coming',coverImage:'https://images.unsplash.com/photo-1508057198894-247b23fe5ade?w=400',summary:'西洋座钟',isFeatured:false,sort:21},
-        {id:22,title:'劳力士手表',category:'misc',status:'sold',coverImage:'https://images.unsplash.com/photo-1523170335258-f5ed11844a49?w=400',summary:'劳力士',isFeatured:true,sort:22},
-        {id:23,title:'紫砂壶 名家款',category:'misc',status:'unsold',coverImage:'https://images.unsplash.com/photo-1565193566173-7a0ee3dbe261?w=400',summary:'紫砂壶',isFeatured:false,sort:23},
-        {id:24,title:'沉香手串',category:'misc',status:'coming',coverImage:'https://images.unsplash.com/photo-1611085583191-a3b181a88401?w=400',summary:'沉香',isFeatured:false,sort:24}
-    ];
-}
-
-function getDefaultNews() {
-    return [
-        {id:1,title:'2026年春季艺术品拍卖会圆满落幕',category:'brand',coverImage:'https://images.unsplash.com/photo-1518998053901-5348d3961a04?w=400',summary:'成交总额突破5亿元',content:'<p>拍卖会圆满落幕</p>',isTop:true,sort:1},
-        {id:2,title:'收藏市场持续升温',category:'industry',coverImage:'https://images.unsplash.com/photo-1578926288207-a90a5366759d?w=400',summary:'市场持续升温',content:'<p>市场升温</p>',isTop:false,sort:2},
-        {id:3,title:'嘉孚堂开通线上藏品征集服务',category:'brand',coverImage:'https://images.unsplash.com/photo-1621155346337-1d19476ba7d6?w=400',summary:'开通服务',content:'<p>开通服务</p>',isTop:false,sort:3}
-    ];
-}
-
-// 站点信息
-const siteInfo = {
-    name: '嘉孚堂',
-    tagline: '让珍宝遇见知己',
-    phone: '400-888-8888',
-    email: 'service@jiafutang.com',
-    address: '海南省海口区',
-    icp: '沪ICP备XXXXXXXX号'
+const COLLECTION_CATEGORIES = {
+    all: '全部', art: '艺术品', antique: '古董文物', 
+    jewelry: '珠宝奢侈品', coin: '文献邮币', nft: '数字藏品', misc: '杂项'
 };
+
+const COLLECTION_STATUS = {
+    sold: '已拍卖', unsold: '未拍卖', coming: '即将拍卖'
+};
+
+const NEWS_CATEGORIES = {
+    all: '全部', brand: '嘉孚堂动态', industry: '行业动态'
+};
+
+// ============ 数据加载 ============
+async function loadData() {
+    try {
+        const [cRes, nRes] = await Promise.all([
+            fetch(API_URL + '/api/collections'),
+            fetch(API_URL + '/api/news')
+        ]);
+        collections = await cRes.json();
+        news = await nRes.json();
+        renderPage();
+        initFilters();
+        initHeader();
+        initHeroSlider();
+    } catch(e) {
+        console.error('加载失败:', e);
+    }
+}
+
+// ============ 页面渲染 ============
+function renderPage() {
+    // 首页精选（不显示状态）- 如果没有 is_featured 则显示所有
+    const fg = document.getElementById('featuredGrid');
+    if (fg) {
+        const featured = collections.filter(c => c.is_featured == 1);
+        const displayCols = featured.length > 0 ? featured : collections;
+        fg.innerHTML = displayCols.slice(0,4).map(item => createCollectionCard(item, false)).join('');
+    }
+    
+    // 首页新闻 - 如果没有 is_featured/is_top 则显示所有
+    const hg = document.getElementById('homeNewsGrid');
+    if (hg) {
+        const featuredNews = news.filter(n => n.is_featured == 1 || n.is_top == 1);
+        const displayNews = featuredNews.length > 0 ? featuredNews : news;
+        hg.innerHTML = [...displayNews].sort((a,b) => b.sort - a.sort).slice(0,4).map(createNewsCard).join('');
+    }
+    
+    // 统计数字动画
+    initStatsAnimation();
+    
+    // 藏品列表
+    const cg = document.getElementById('collectionGrid');
+    if (cg) renderCollections();
+    
+    // 新闻列表
+    const ng = document.getElementById('newsListGrid');
+    if (ng) renderNews();
+}
+
+// 渲染藏品列表
+function renderCollections() {
+    const cg = document.getElementById('collectionGrid');
+    if (!cg) return;
+    
+    const category = document.querySelector('.filter-tabs .filter-btn.active')?.dataset.category || 'all';
+    const status = document.querySelector('.filter-status .filter-btn.active')?.dataset.status || 'all';
+    const keyword = document.getElementById('collectionSearchInput')?.value.trim() || '';
+    
+    let filtered = [...collections];
+    if (category !== 'all') filtered = filtered.filter(c => c.category === category);
+    if (status !== 'all') filtered = filtered.filter(c => c.status === status);
+    if (keyword) filtered = filtered.filter(c => c.title.includes(keyword) || (c.summary && c.summary.includes(keyword)));
+    
+    filtered.sort((a,b) => b.sort - a.sort);
+    cg.style.cssText = 'display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:30px;';
+    cg.innerHTML = filtered.map(item => createCollectionCard(item, true)).join('');
+}
+
+// 渲染新闻列表
+function renderNews() {
+    const ng = document.getElementById('newsListGrid');
+    if (!ng) return;
+    
+    const category = document.querySelector('.filter-tabs .filter-btn.active')?.dataset.category || 'all';
+    const keyword = document.getElementById('newsSearchInput')?.value.trim() || '';
+    
+    let filtered = [...news];
+    if (category !== 'all') filtered = filtered.filter(n => n.category === category);
+    if (keyword) filtered = filtered.filter(n => n.title.includes(keyword) || (n.summary && n.summary.includes(keyword)));
+    
+    filtered.sort((a,b) => b.sort - a.sort);
+    ng.style.cssText = 'display:grid;grid-template-columns:repeat(auto-fill,minmax(320px,1fr));gap:30px;';
+    ng.innerHTML = filtered.map(createNewsCard).join('');
+}
+
+// ============ 组件创建 ============
+function createCollectionCard(item, showStatus = true) {
+    const statusHtml = showStatus ? '<span class="card-status ' + item.status + '">' + COLLECTION_STATUS[item.status] + '</span>' : '';
+    return '<div class="collection-card" style="background:#fff;border-radius:12px;overflow:hidden;box-shadow:0 4px 20px rgba(0,0,0,0.08);transition:transform 0.3s;">' +
+        '<div style="position:relative;aspect-ratio:4/3;overflow:hidden;">' +
+        '<img src="' + item.cover_image + '" alt="' + item.title + '" style="width:100%;height:100%;object-fit:cover;">' +
+        statusHtml +
+        '</div>' +
+        '<div style="padding:20px;">' +
+        '<h3 style="font-size:18px;margin-bottom:8px;color:#333;">' + item.title + '</h3>' +
+        '<p style="font-size:14px;color:#666;">' + COLLECTION_CATEGORIES[item.category] + ' · ' + (item.summary||'').substring(0,15) + '</p>' +
+        '</div></div>';
+}
+
+function createNewsCard(item) {
+    return '<div class="news-card" style="background:#fff;border-radius:12px;overflow:hidden;box-shadow:0 4px 20px rgba(0,0,0,0.08);transition:transform 0.3s;">' +
+        '<div style="aspect-ratio:16/9;overflow:hidden;">' +
+        '<img src="' + item.cover_image + '" alt="' + item.title + '" style="width:100%;height:100%;object-fit:cover;">' +
+        '</div>' +
+        '<div style="padding:20px;">' +
+        '<span style="display:inline-block;padding:4px 12px;background:#f5f5f5;border-radius:4px;font-size:12px;color:#666;margin-bottom:12px;">' + NEWS_CATEGORIES[item.category] + '</span>' +
+        '<h3 style="font-size:18px;margin-bottom:8px;color:#333;line-height:1.4;">' + item.title + '</h3>' +
+        '<p style="font-size:14px;color:#888;line-height:1.6;">' + (item.summary||'') + '</p>' +
+        '</div></div>';
+}
+
+// ============ 初始化功能 ============
+function initFilters() {
+    // 移动端菜单
+    const hamburger = document.getElementById('hamburger');
+    const nav = document.getElementById('nav');
+    
+    if (hamburger && nav) {
+        hamburger.addEventListener('click', function(e) {
+            e.preventDefault();
+            hamburger.classList.toggle('active');
+            nav.classList.toggle('active');
+        });
+        
+        nav.querySelectorAll('.nav-link').forEach(link => {
+            link.addEventListener('click', function() {
+                hamburger.classList.remove('active');
+                nav.classList.remove('active');
+            });
+        });
+    }
+    
+    // 藏品分类筛选
+    document.querySelectorAll('.filter-tabs .filter-btn').forEach(btn => {
+        btn.addEventListener('click', function() {
+            this.parentElement.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+            this.classList.add('active');
+            renderCollections();
+        });
+    });
+    
+    // 藏品状态筛选
+    document.querySelectorAll('.filter-status .filter-btn').forEach(btn => {
+        btn.addEventListener('click', function() {
+            this.parentElement.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+            this.classList.add('active');
+            renderCollections();
+        });
+    });
+    
+    // 藏品搜索
+    document.getElementById('collectionSearchBtn')?.addEventListener('click', renderCollections);
+    document.getElementById('collectionSearchInput')?.addEventListener('keypress', e => { if(e.key === 'Enter') renderCollections(); });
+    
+    // 新闻筛选
+    document.querySelectorAll('.news-tabs .filter-btn, .filter-tabs .filter-btn').forEach(btn => {
+        btn.addEventListener('click', function() {
+            this.parentElement.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+            this.classList.add('active');
+            renderNews();
+        });
+    });
+    
+    document.getElementById('newsSearchBtn')?.addEventListener('click', renderNews);
+    document.getElementById('newsSearchInput')?.addEventListener('keypress', e => { if(e.key === 'Enter') renderNews(); });
+    
+    // 首页精品典藏Tab切换
+    document.querySelectorAll('.featured-tabs .tab-btn').forEach(btn => {
+        btn.addEventListener('click', function() {
+            this.parentElement.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+            this.classList.add('active');
+            const category = this.dataset.category;
+            renderFeaturedGrid(category);
+        });
+    });
+    
+    // 首页资讯动态Tab切换
+    document.querySelectorAll('.news-tabs .tab-btn').forEach(btn => {
+        btn.addEventListener('click', function() {
+            this.parentElement.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+            this.classList.add('active');
+            const category = this.dataset.category;
+            renderHomeNewsGrid(category);
+        });
+    });
+}
+
+// 首页精品典藏渲染
+function renderFeaturedGrid(category) {
+    const fg = document.getElementById('featuredGrid');
+    if (!fg) return;
+    
+    let filtered = collections.filter(c => c.is_featured == 1);
+    if (category !== 'all') filtered = filtered.filter(c => c.category === category);
+    
+    fg.innerHTML = filtered.slice(0, 8).map(item => createCollectionCard(item, false)).join('');
+}
+
+// 首页资讯动态渲染
+function renderHomeNewsGrid(category) {
+    const hg = document.getElementById('homeNewsGrid');
+    if (!hg) return;
+    
+    let filtered = [...news];
+    if (category !== 'all') filtered = filtered.filter(n => n.category === category);
+    
+    hg.innerHTML = filtered.sort((a,b) => b.sort - a.sort).slice(0, 4).map(createNewsCard).join('');
+}
+
+// Header 滚动效果
+function initHeader() {
+    const header = document.getElementById('header');
+    if (header) {
+        window.addEventListener('scroll', () => {
+            header.classList.toggle('scrolled', window.pageYOffset > 100);
+        });
+    }
+}
+
+// Hero 轮播
+function initHeroSlider() {
+    const slider = document.getElementById('heroSlider');
+    const dots = document.querySelectorAll('.hero-dots .dot');
+    if (!slider || dots.length === 0) return;
+    
+    let current = 0;
+    const slides = slider.querySelectorAll('.hero-slide');
+    const total = slides.length;
+    
+    function goTo(index) {
+        slides.forEach(s => s.classList.remove('active'));
+        dots.forEach(d => d.classList.remove('active'));
+        slides[index].classList.add('active');
+        dots[index].classList.add('active');
+        current = index;
+    }
+    
+    dots.forEach((dot, i) => dot.addEventListener('click', () => { goTo(i); }));
+    
+    setInterval(() => goTo((current + 1) % total), 4000);
+}
+
+// 统计数字动画
+function initStatsAnimation() {
+    const stats = document.querySelectorAll('.stat-number');
+    const observer = new IntersectionObserver(entries => {
+        entries.forEach(entry => {
+            if (entry.isIntersecting) {
+                const target = parseInt(entry.target.dataset.target);
+                animateNum(entry.target, target);
+                observer.unobserve(entry.target);
+            }
+        });
+    }, { threshold: 0.5 });
+    stats.forEach(s => observer.observe(s));
+}
+
+function animateNum(el, target) {
+    const dur = 1500, start = performance.now();
+    function update(now) {
+        const p = Math.min((now - start) / dur, 1);
+        el.textContent = Math.floor(p * target) + '+';
+        if (p < 1) requestAnimationFrame(update);
+    }
+    requestAnimationFrame(update);
+}
+
+// 表单提交
+function initSubmissionForm() {
+    const form = document.getElementById('submissionForm');
+    if (!form) return;
+    
+    const submitBtn = form.querySelector('.form-submit .btn');
+    const fileInput = form.querySelector('#itemImages');
+    const previewContainer = form.querySelector('.image-preview');
+    let uploadedImages = [];
+    
+    if (fileInput) {
+        fileInput.addEventListener('change', function(e) {
+            const files = Array.from(e.target.files);
+            files.forEach(file => {
+                if (uploadedImages.length >= 6) { alert('最多上传6张图片'); return; }
+                if (!file.type.startsWith('image/')) { alert('请上传图片文件'); return; }
+                if (file.size > 5 * 1024 * 1024) { alert('图片大小不能超过5MB'); return; }
+                const reader = new FileReader();
+                reader.onload = function(event) { uploadedImages.push(event.target.result); renderImagePreview(); };
+                reader.readAsDataURL(file);
+            });
+            this.value = '';
+        });
+    }
+    
+    function renderImagePreview() {
+        if (!previewContainer) return;
+        previewContainer.innerHTML = uploadedImages.map((src, index) => 
+            '<div class="image-preview-item"><img src="' + src + '" alt="预览图片' + (index+1) + '"><button type="button" class="remove-btn" data-index="' + index + '">×</button></div>'
+        ).join('');
+        previewContainer.querySelectorAll('.remove-btn').forEach(btn => {
+            btn.addEventListener('click', function() { uploadedImages.splice(parseInt(this.dataset.index), 1); renderImagePreview(); });
+        });
+    }
+    
+    form.addEventListener('submit', function(e) {
+        e.preventDefault();
+        if (!form.querySelector('#privacyAgree')?.checked) { alert('请阅读并同意隐私条款'); return; }
+        
+        submitBtn.disabled = true;
+        submitBtn.textContent = '提交中...';
+        
+        const submission = {
+            id: Date.now(),
+            item_name: form.querySelector('#itemName')?.value || '',
+            category: form.querySelector('#itemCategory')?.value || '',
+            estimated_value: form.querySelector('#estimatedValue')?.value || '',
+            description: form.querySelector('#itemDescription')?.value || '',
+            contact_name: form.querySelector('#contactName')?.value || '',
+            contact_mobile: form.querySelector('#contactMobile')?.value || '',
+            contact_city: form.querySelector('#contactCity')?.value || '',
+            images: uploadedImages,
+            status: 'pending',
+            created_at: new Date().toISOString()
+        };
+        
+        const submissions = JSON.parse(localStorage.getItem('jiafu_submissions') || '[]');
+        submissions.unshift(submission);
+        localStorage.setItem('jiafu_submissions', JSON.stringify(submissions));
+        
+        setTimeout(function() {
+            form.innerHTML = '<div style="text-align:center;padding:60px;"><h2 style="margin-bottom:20px;">✅ 提交成功</h2><p>我们已经收到您的藏品信息，将尽快与您联系</p><a href="consignment.html" class="btn btn-primary" style="display:inline-block;margin-top:30px;">查看征集流程</a></div>';
+        }, 800);
+    });
+}
+
+// ============ 启动 ============
+console.log('data.js 初始化');
+if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', function() {
+        loadData();
+        initSubmissionForm();
+    });
+} else {
+    loadData();
+    initSubmissionForm();
+}

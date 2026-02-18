@@ -12,7 +12,7 @@
 </head>
 <body>
     <!-- Header -->
-    <header class="header scrolled" id="header">
+    <header class="header" id="header">
         <div class="container header-inner">
             <a href="index.html" class="logo">
                 <img src="images/logo.png" alt="嘉孚堂" class="logo-img">
@@ -111,7 +111,7 @@
                     <div class="form-group">
                         <label class="form-checkbox">
                             <input type="checkbox" id="privacyAgree" name="privacyAgree" required>
-                            <span>我已阅读并同意 <a href="#" style="color: var(--color-primary);">《隐私条款》</a> <span class="required">*</span></span>
+                            <span>我已阅读并同意 <a href="privacy.html" target="_blank" style="color: var(--color-primary);">《隐私条款》</a> <span class="required">*</span></span>
                         </label>
                     </div>
                     
@@ -150,24 +150,6 @@
         </div>
     </footer>
 
-    <script src="js/main.js"></script>
-    <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            const hamburger = document.getElementById('hamburger');
-            const nav = document.getElementById('nav');
-            if (hamburger && nav) {
-                hamburger.addEventListener('click', function() {
-                    hamburger.classList.toggle('active');
-                    nav.classList.toggle('active');
-                });
-                nav.querySelectorAll('.nav-link').forEach(link => {
-                    link.addEventListener('click', function() {
-                        hamburger.classList.remove('active');
-                        nav.classList.remove('active');
-                    });
-                });
-            }
-        });
-    </script>
+    <script src="js/data.js"></script>
 </body>
 </html>

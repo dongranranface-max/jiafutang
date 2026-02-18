@@ -3,73 +3,141 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>控制台 - 嘉孚堂后台管理系统</title>
+    <title>控制台 - 嘉孚堂后台</title>
     <link rel="stylesheet" href="../css/style.css">
-    <link rel="stylesheet" href="css/admin.css">
+    <style>
+        * { box-sizing: border-box; }
+        body { margin: 0; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: #f5f7fa; }
+        .admin-wrapper { display: flex; min-height: 100vh; }
+        .sidebar { width: 240px; background: linear-gradient(180deg, #1a1a2e 0%, #16213e 100%); color: #fff; position: fixed; height: 100vh; }
+        .sidebar-header { padding: 30px 20px; text-align: center; border-bottom: 1px solid rgba(255,255,255,0.1); }
+        .sidebar-header img { width: 60px; margin-bottom: 10px; }
+        .sidebar-header h2 { margin: 0; font-size: 18px; }
+        .sidebar-nav { padding: 20px 0; }
+        .nav-item { display: flex; align-items: center; padding: 15px 25px; color: rgba(255,255,255,0.7); text-decoration: none; transition: all 0.3s; }
+        .nav-item:hover, .nav-item.active { background: rgba(255,255,255,0.1); color: #fff; border-left: 3px solid #c9a962; }
+        .nav-item span:first-child { margin-right: 10px; font-size: 18px; }
+        .main-content { flex: 1; margin-left: 240px; padding: 30px; }
+        .page-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px; }
+        .page-header h1 { margin: 0; font-size: 28px; color: #1a1a2e; }
+        
+        /* 欢迎条 */
+        .welcome-bar { background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%); color: #fff; padding: 30px; border-radius: 12px; margin-bottom: 30px; }
+        .welcome-bar h2 { margin: 0 0 10px; font-size: 24px; }
+        .welcome-bar p { margin: 0; opacity: 0.8; }
+        
+        /* 统计卡片 */
+        .stats-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 20px; margin-bottom: 30px; }
+        .stat-card { background: #fff; padding: 24px; border-radius: 12px; text-align: center; box-shadow: 0 2px 10px rgba(0,0,0,0.05); transition: transform 0.3s; cursor: pointer; }
+        .stat-card:hover { transform: translateY(-3px); }
+        .stat-card h3 { margin: 0 0 10px; font-size: 14px; color: #888; font-weight: 500; }
+        .stat-card .number { font-size: 36px; font-weight: bold; color: #1a1a2e; }
+        .stat-card .trend { font-size: 12px; margin-top: 5px; }
+        .stat-card .trend.up { color: #2ed573; }
+        .stat-card .trend.down { color: #ff4757; }
+        
+        /* 快捷入口 */
+        .quick-actions { display: grid; grid-template-columns: repeat(4, 1fr); gap: 15px; margin-bottom: 30px; }
+        .quick-action { background: #fff; padding: 20px; border-radius: 12px; text-align: center; text-decoration: none; color: #333; box-shadow: 0 2px 10px rgba(0,0,0,0.05); transition: all 0.3s; }
+        .quick-action:hover { transform: translateY(-3px); box-shadow: 0 4px 20px rgba(0,0,0,0.1); }
+        .quick-action .icon { font-size: 32px; margin-bottom: 10px; }
+        .quick-action .label { font-size: 14px; font-weight: 500; }
+        
+        /* 最近提交 */
+        .section-title { font-size: 18px; font-weight: 600; color: #1a1a2e; margin-bottom: 15px; display: flex; justify-content: space-between; align-items: center; }
+        .table-wrapper { background: #fff; border-radius: 12px; overflow: hidden; box-shadow: 0 2px 10px rgba(0,0,0,0.05); margin-bottom: 30px; }
+        .data-table { width: 100%; border-collapse: collapse; }
+        .data-table th { background: #f8f9fa; padding: 15px; text-align: left; font-weight: 600; color: #555; font-size: 13px; text-transform: uppercase; }
+        .data-table td { padding: 15px; border-bottom: 1px solid #f0f0f0; font-size: 14px; }
+        .data-table tr:hover { background: #fafafa; }
+        .data-table tr:last-child td { border-bottom: none; }
+        
+        .status-tag { padding: 4px 10px; border-radius: 20px; font-size: 12px; }
+        .status-tag.pending { background: #fff3e0; color: #ef6c00; }
+        .status-tag.processed { background: #e8f5e9; color: #2e7d32; }
+        
+        .btn-link { color: #c9a962; text-decoration: none; font-size: 13px; }
+        .btn-link:hover { text-decoration: underline; }
+        
+        .empty-state { text-align: center; padding: 40px; color: #999; }
+        
+        .last-sync { text-align: center; color: #999; font-size: 12px; margin-top: 20px; }
+    </style>
 </head>
 <body>
     <div class="admin-wrapper">
-        <!-- 侧边栏 -->
         <aside class="sidebar">
             <div class="sidebar-header">
                 <img src="../images/logo.png" alt="嘉孚堂">
                 <h2>后台管理</h2>
             </div>
             <nav class="sidebar-nav">
-                <a href="dashboard.html" class="nav-item active">
-                    <span>📊</span> <span>控制台</span>
-                </a>
-                <a href="pages/collections.html" class="nav-item">
-                    <span>🎨</span> <span>藏品管理</span>
-                </a>
-                <a href="pages/news.html" class="nav-item">
-                    <span>📰</span> <span>新闻管理</span>
-                </a>
-                <a href="pages/submissions.html" class="nav-item">
-                    <span>📋</span> <span>提交记录</span>
-                </a>
-                <a href="#" onclick="logout(); return false;" class="nav-item">
-                    <span>🚪</span> <span>退出登录</span>
-                </a>
+                <a href="dashboard.html" class="nav-item active"><span>📊</span><span>控制台</span></a>
+                <a href="pages/collections.html" class="nav-item"><span>🎨</span><span>藏品管理</span></a>
+                <a href="pages/news.html" class="nav-item"><span>📰</span><span>新闻管理</span></a>
+                <a href="pages/submissions.html" class="nav-item"><span>📋</span><span>提交记录</span></a>
+                <a href="#" onclick="logout()" class="nav-item"><span>🚪</span><span>退出登录</span></a>
             </nav>
         </aside>
 
-        <!-- 主内容 -->
         <main class="main-content">
             <div class="page-header">
-                <h1>控制台</h1>
-                <div class="user-info">
-                    <span>欢迎，<strong id="currentUser">admin</strong></span>
-                    <button class="btn-logout" onclick="logout()">退出</button>
+                <h1>📊 控制台</h1>
+                <button class="btn" onclick="refreshData()" style="background:#fff;border:1px solid #ddd;">🔄 刷新数据</button>
+            </div>
+
+            <!-- 欢迎 -->
+            <div class="welcome-bar">
+                <h2>👋 欢迎回来，管理员</h2>
+                <p>这里是嘉孚堂后台管理系统，您可以管理藏品、新闻和用户提交记录</p>
+            </div>
+
+            <!-- 统计 -->
+            <div class="stats-grid">
+                <div class="stat-card" onclick="location.href='pages/collections.html'">
+                    <h3>🎨 藏品总数</h3>
+                    <div class="number" id="totalCollections">-</div>
+                </div>
+                <div class="stat-card" onclick="location.href='pages/news.html'">
+                    <h3>📰 新闻总数</h3>
+                    <div class="number" id="totalNews">-</div>
+                </div>
+                <div class="stat-card" onclick="location.href='pages/submissions.html'">
+                    <h3>📋 提交记录</h3>
+                    <div class="number" id="totalSubmissions">-</div>
+                </div>
+                <div class="stat-card" onclick="location.href='pages/collections.html?status=sold'">
+                    <h3>✅ 已拍卖</h3>
+                    <div class="number" id="soldCollections">-</div>
                 </div>
             </div>
 
-            <!-- 统计卡片 -->
-            <div class="stats-grid">
-                <div class="stat-card">
-                    <h3>藏品总数</h3>
-                    <div class="number" id="totalCollections">0</div>
-                </div>
-                <div class="stat-card">
-                    <h3>新闻总数</h3>
-                    <div class="number" id="totalNews">0</div>
-                </div>
-                <div class="stat-card">
-                    <h3>提交记录</h3>
-                    <div class="number" id="totalSubmissions">0</div>
-                </div>
-                <div class="stat-card">
-                    <h3>已拍卖藏品</h3>
-                    <div class="number" id="soldCollections">0</div>
-                </div>
+            <!-- 快捷入口 -->
+            <div class="quick-actions">
+                <a href="pages/collections.html" class="quick-action">
+                    <div class="icon">🎨</div>
+                    <div class="label">管理藏品</div>
+                </a>
+                <a href="pages/news.html" class="quick-action">
+                    <div class="icon">📰</div>
+                    <div class="label">管理新闻</div>
+                </a>
+                <a href="pages/submissions.html" class="quick-action">
+                    <div class="icon">📋</div>
+                    <div class="label">查看提交</div>
+                </a>
+                <a href="../index.html" class="quick-action" target="_blank">
+                    <div class="icon">🌐</div>
+                    <div class="label">预览网站</div>
+                </a>
             </div>
 
             <!-- 最近提交 -->
-            <div class="data-table-container">
-                <div class="table-toolbar">
-                    <h3>最近提交的藏品</h3>
-                    <a href="pages/submissions.html" class="btn-sm btn-view">查看全部</a>
-                </div>
+            <div class="section-title">
+                <span>最近提交的藏品</span>
+                <a href="pages/submissions.html" class="btn-link">查看全部 →</a>
+            </div>
+            <div class="table-wrapper">
                 <table class="data-table">
                     <thead>
                         <tr>
@@ -77,124 +145,115 @@
                             <th>品类</th>
                             <th>联系人</th>
                             <th>联系方式</th>
+                            <th>状态</th>
                             <th>提交时间</th>
                         </tr>
                     </thead>
                     <tbody id="recentSubmissions">
-                        <tr>
-                            <td colspan="5" class="empty-state">暂无提交记录</td>
-                        </tr>
+                        <tr><td colspan="6" class="empty-state">加载中...</td></tr>
                     </tbody>
                 </table>
             </div>
+
+            <div class="last-sync" id="lastSync"></div>
         </main>
     </div>
 
-    <script src="js/auth.js"></script>
     <script>
-        // 检查登录
-        checkAuth();
-        
-        // 显示当前用户
-        document.getElementById('currentUser').textContent = getCurrentUser();
-        
-        // 默认数据
-        const defaultCollections = [
-            // 古董文物 (4件)
-            {id: 1, title: '清代紫檀木雕福禄寿屏风', category: 'antique', status: 'sold', coverImage: 'https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=600', summary: '清代晚期紫檀木雕', isFeatured: true},
-            {id: 2, title: '民国粉彩人物故事瓶', category: 'antique', status: 'coming', coverImage: 'https://images.unsplash.com/photo-1565193566173-7a0ee3dbe261?w=600', summary: '民国粉彩名品', isFeatured: true},
-            {id: 3, title: '明式黄花梨官帽椅', category: 'antique', status: 'sold', coverImage: 'https://images.unsplash.com/photo-1506439773649-6e0eb8cfb237?w=600', summary: '明式家具经典', isFeatured: false},
-            {id: 4, title: '宋代建窑兔毫盏', category: 'antique', status: 'sold', coverImage: 'https://images.unsplash.com/photo-1544787219-7f47ccb76574?w=600', summary: '宋代建窑', isFeatured: false},
-            // 艺术品 (4件)
-            {id: 5, title: '齐白石《虾趣图》', category: 'art', status: 'sold', coverImage: 'https://images.unsplash.com/photo-1578926288207-a90a5366759d?w=600', summary: '齐白石精品', isFeatured: true},
-            {id: 6, title: '张大千《山水四条屏》', category: 'art', status: 'unsold', coverImage: 'https://images.unsplash.com/photo-1605883705077-8d3d3cebe78c?w=600', summary: '张大千山水', isFeatured: true},
-            {id: 7, title: '傅抱石《山水长卷》', category: 'art', status: 'coming', coverImage: 'https://images.unsplash.com/photo-1600636567129-674c947c29b7?w=600', summary: '傅抱石力作', isFeatured: false},
-            {id: 8, title: '徐悲鸿《奔马图》', category: 'art', status: 'unsold', coverImage: 'https://images.unsplash.com/photo-1518998053901-5348d3961a04?w=600', summary: '徐悲鸿代表作', isFeatured: false},
-            // 珠宝奢侈品 (4件)
-            {id: 9, title: '卡地亚钻石胸针', category: 'jewelry', status: 'unsold', coverImage: 'https://images.unsplash.com/photo-1515562141207-7a88fb7ce338?w=600', summary: '卡地亚经典', isFeatured: true},
-            {id: 10, title: '翡翠手镯 玻璃种', category: 'jewelry', status: 'coming', coverImage: 'https://images.unsplash.com/photo-1602751584552-8ba73aad10e1?w=600', summary: '玻璃种翡翠', isFeatured: true},
-            {id: 11, title: '梵克雅宝钻石项链', category: 'jewelry', status: 'sold', coverImage: 'https://images.unsplash.com/photo-1599643478518-a784e5dc4c8f?w=600', summary: '梵克雅宝', isFeatured: false},
-            {id: 12, title: '红宝石戒指', category: 'jewelry', status: 'unsold', coverImage: 'https://images.unsplash.com/photo-1605100804763-247f67b3557e?w=600', summary: '鸽血红宝石', isFeatured: false},
-            // 文献邮币 (4件)
-            {id: 13, title: '第一版人民币全套', category: 'coin', status: 'sold', coverImage: 'https://images.unsplash.com/photo-1621155346337-1d19476ba7d6?w=600', summary: '第一版人民币', isFeatured: true},
-            {id: 14, title: '文革时期珍邮票', category: 'coin', status: 'unsold', coverImage: 'https://images.unsplash.com/photo-1580196929935-77f7a7a8e389?w=600', summary: '文革邮票', isFeatured: false},
-            {id: 15, title: '袁大头银元', category: 'coin', status: 'coming', coverImage: 'https://images.unsplash.com/photo-1610375461246-83df859d849d?w=600', summary: '袁大头', isFeatured: false},
-            {id: 16, title: '古钱币一组', category: 'coin', status: 'unsold', coverImage: 'https://images.unsplash.com/photo-1571752726703-5e7d1f6a986d?w=600', summary: '古钱币', isFeatured: false},
-            // 数字藏品 (4件)
-            {id: 17, title: 'NFT《创世之境》', category: 'nft', status: 'coming', coverImage: 'https://images.unsplash.com/photo-1642104704074-907c0698cbd9?w=600', summary: '数字艺术品', isFeatured: true},
-            {id: 18, title: 'NFT《星际幻想》', category: 'nft', status: 'unsold', coverImage: 'https://images.unsplash.com/photo-1620641788421-7a1c342ea42e?w=600', summary: '限量版NFT', isFeatured: false},
-            {id: 19, title: 'NFT《赛博朋克》', category: 'nft', status: 'sold', coverImage: 'https://images.unsplash.com/photo-1634152962476-4b8a00e1915c?w=600', summary: '赛博朋克', isFeatured: false},
-            {id: 20, title: 'NFT《抽象艺术》', category: 'nft', status: 'unsold', coverImage: 'https://images.unsplash.com/photo-1618005198919-d3d4b5a92ead?w=600', summary: '抽象NFT', isFeatured: false},
-            // 杂项 (4件)
-            {id: 21, title: '19世纪西洋座钟', category: 'misc', status: 'coming', coverImage: 'https://images.unsplash.com/photo-1508057198894-247b23fe5ade?w=600', summary: '西洋座钟', isFeatured: false},
-            {id: 22, title: '劳力士手表', category: 'misc', status: 'sold', coverImage: 'https://images.unsplash.com/photo-1523170335258-f5ed11844a49?w=600', summary: '劳力士', isFeatured: true},
-            {id: 23, title: '紫砂壶 名家款', category: 'misc', status: 'unsold', coverImage: 'https://images.unsplash.com/photo-1565193566173-7a0ee3dbe261?w=600', summary: '紫砂壶', isFeatured: false},
-            {id: 24, title: '沉香手串', category: 'misc', status: 'coming', coverImage: 'https://images.unsplash.com/photo-1611085583191-a3b181a88401?w=600', summary: '沉香', isFeatured: false}
-        ];
-        
-        const defaultNews = [
-            {id: 1, title: '2026年春季艺术品拍卖会圆满落幕', category: 'brand', coverImage: 'https://images.unsplash.com/photo-1518998053901-5348d3961a04?w=600', summary: '本次拍卖会成交总额突破5亿元', publishAt: '2026-02-15', isTop: true},
-            {id: 2, title: '收藏市场持续升温 专家解读投资趋势', category: 'industry', coverImage: 'https://images.unsplash.com/photo-1578926288207-a90a5366759d?w=600', summary: '艺术品收藏市场持续升温', publishAt: '2026-02-12', isTop: false},
-            {id: 3, title: '嘉孚堂正式开通线上藏品征集服务', category: 'brand', coverImage: 'https://images.unsplash.com/photo-1621155346337-1d19476ba7d6?w=600', summary: '开通线上藏品征集服务', publishAt: '2026-02-05', isTop: false}
-        ];
-        
-        // 初始化数据（如果localStorage为空）
-        if (!localStorage.getItem('jiafu_collections')) {
-            localStorage.setItem('jiafu_collections', JSON.stringify(defaultCollections));
-        }
-        if (!localStorage.getItem('jiafu_news')) {
-            localStorage.setItem('jiafu_news', JSON.stringify(defaultNews));
-        }
-        if (!localStorage.getItem('jiafu_submissions')) {
-            localStorage.setItem('jiafu_submissions', JSON.stringify([]));
-        }
-        
-        // 加载统计数据
-        function loadStats() {
-            const collections = JSON.parse(localStorage.getItem('jiafu_collections') || '[]');
-            const news = JSON.parse(localStorage.getItem('jiafu_news') || '[]');
-            const submissions = JSON.parse(localStorage.getItem('jiafu_submissions') || '[]');
-            
-            document.getElementById('totalCollections').textContent = collections.length;
-            document.getElementById('totalNews').textContent = news.length;
-            document.getElementById('totalSubmissions').textContent = submissions.length;
-            document.getElementById('soldCollections').textContent = collections.filter(c => c.status === 'sold').length;
-            
-            // 显示最近提交
-            const tbody = document.getElementById('recentSubmissions');
-            if (submissions.length > 0) {
-                const recent = submissions.slice(-5).reverse();
-                tbody.innerHTML = recent.map(s => `
-                    <tr>
-                        <td>${s.itemName || '-'}</td>
-                        <td>${getCategoryName(s.itemCategory)}</td>
-                        <td>${s.contactName || '-'}</td>
-                        <td>${s.contactMobile || s.contactWechat || '-'}</td>
-                        <td>${formatDate(s.createdAt)}</td>
-                    </tr>
-                `).join('');
-            }
-        }
-        
-        function getCategoryName(category) {
-            const categories = {
-                'art': '艺术品',
-                'antique': '古董文物',
-                'jewelry': '珠宝奢侈品',
-                'coin': '文献邮币',
-                'nft': '数字藏品',
-                'misc': '杂项'
-            };
-            return categories[category] || category;
-        }
-        
-        function formatDate(dateStr) {
-            if (!dateStr) return '-';
-            const date = new Date(dateStr);
-            return date.toLocaleDateString('zh-CN');
-        }
-        
+    const API_URL = 'https://jiafutang-api.dongranranface.workers.dev';
+    let stats = { collections: 0, news: 0, submissions: 0, sold: 0 };
+
+    // 初始化
+    function init() {
         loadStats();
+    }
+
+    // 加载统计数据（从API）
+    async function loadStats() {
+        try {
+            // 并行请求
+            const [collectionsRes, newsRes] = await Promise.all([
+                fetch(API_URL + '/api/collections'),
+                fetch(API_URL + '/api/news')
+            ]);
+            
+            let collections = await collectionsRes.json();
+            let news = await newsRes.json();
+            
+            // 确保是数组
+            if (!Array.isArray(collections)) collections = [];
+            if (!Array.isArray(news)) news = [];
+            
+            // 藏品统计
+            stats.collections = collections.length;
+            stats.sold = (collections.filter(c => c.status === 'sold')).length;
+            
+            // 新闻统计
+            stats.news = news.length;
+            
+            // 提交记录（从localStorage）
+            const submissions = JSON.parse(localStorage.getItem('jiafu_submissions') || '[]');
+            stats.submissions = submissions.length || 0;
+            
+            // 渲染
+            document.getElementById('totalCollections').textContent = stats.collections;
+            document.getElementById('totalNews').textContent = stats.news;
+            document.getElementById('totalSubmissions').textContent = stats.submissions;
+            document.getElementById('soldCollections').textContent = stats.sold;
+            
+            // 最近提交
+            renderRecentSubmissions(submissions);
+            
+            // 更新时间
+            document.getElementById('lastSync').textContent = '数据更新于 ' + new Date().toLocaleString('zh-CN');
+            
+        } catch (e) {
+            console.error('加载数据失败:', e);
+            document.getElementById('recentSubmissions').innerHTML = '<tr><td colspan="6" class="empty-state">数据加载失败，请刷新页面</td></tr>';
+        }
+    }
+
+    // 渲染最近提交
+    function renderRecentSubmissions(submissions) {
+        if (!submissions || submissions.length === 0) {
+            document.getElementById('recentSubmissions').innerHTML = '<tr><td colspan="6" class="empty-state">暂无提交记录</td></tr>';
+            return;
+        }
+        
+        const categoryMap = {art:'艺术品',antique:'古董文物',jewelry:'珠宝奢侈品',coin:'文献邮币',nft:'数字藏品',misc:'杂项'};
+        
+        // 取最近5条
+        const recent = submissions.slice(0, 5);
+        
+        document.getElementById('recentSubmissions').innerHTML = recent.map(s => {
+            const contact = s.contactMobile || s.contactWechat || '-';
+            const statusClass = s.handleStatus === 'processed' ? 'processed' : 'pending';
+            const statusText = s.handleStatus === 'processed' ? '✓ 已处理' : '⏳ 待处理';
+            return '<tr>' +
+                '<td><strong>' + (s.itemName || '-') + '</strong></td>' +
+                '<td>' + (categoryMap[s.itemCategory] || '-') + '</td>' +
+                '<td>' + (s.contactName || '-') + '</td>' +
+                '<td>' + contact + '</td>' +
+                '<td><span class="status-tag ' + statusClass + '">' + statusText + '</span></td>' +
+                '<td>' + formatDate(s.createdAt) + '</td></tr>';
+        }).join('');
+    }
+
+    function formatDate(dateStr) {
+        if (!dateStr) return '-';
+        const date = new Date(dateStr);
+        return date.toLocaleDateString('zh-CN') + ' ' + date.toLocaleTimeString('zh-CN', {hour:'2-digit',minute:'2-digit'});
+    }
+
+    function refreshData() {
+        loadStats();
+    }
+
+    function logout() {
+        window.location.href = 'index.html';
+    }
+
+    init();
     </script>
 </body>
 </html>

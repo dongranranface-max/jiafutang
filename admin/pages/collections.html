@@ -3,45 +3,130 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>藏品管理 - 嘉孚堂后台管理系统</title>
+    <title>藏品管理 - 嘉孚堂后台</title>
     <link rel="stylesheet" href="../../css/style.css">
-    <link rel="stylesheet" href="../css/admin.css">
+    <style>
+        * { box-sizing: border-box; }
+        body { margin: 0; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: #f5f7fa; }
+        .admin-wrapper { display: flex; min-height: 100vh; }
+        
+        /* 侧边栏 */
+        .sidebar { width: 240px; background: linear-gradient(180deg, #1a1a2e 0%, #16213e 100%); color: #fff; padding: 0; position: fixed; height: 100vh; }
+        .sidebar-header { padding: 30px 20px; text-align: center; border-bottom: 1px solid rgba(255,255,255,0.1); }
+        .sidebar-header img { width: 60px; margin-bottom: 10px; }
+        .sidebar-header h2 { margin: 0; font-size: 18px; }
+        .sidebar-nav { padding: 20px 0; }
+        .nav-item { display: flex; align-items: center; padding: 15px 25px; color: rgba(255,255,255,0.7); text-decoration: none; transition: all 0.3s; }
+        .nav-item:hover, .nav-item.active { background: rgba(255,255,255,0.1); color: #fff; border-left: 3px solid #c9a962; }
+        .nav-item span:first-child { margin-right: 10px; font-size: 18px; }
+        
+        /* 主内容 */
+        .main-content { flex: 1; margin-left: 240px; padding: 30px; }
+        
+        /* 页面头部 */
+        .page-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px; }
+        .page-header h1 { margin: 0; font-size: 28px; color: #1a1a2e; }
+        
+        /* 按钮 */
+        .btn { padding: 10px 20px; border: none; border-radius: 6px; cursor: pointer; font-size: 14px; transition: all 0.3s; }
+        .btn-primary { background: linear-gradient(135deg, #c9a962 0%, #a88b4c 100%); color: #fff; }
+        .btn-primary:hover { transform: translateY(-2px); box-shadow: 0 4px 15px rgba(201,169,98,0.4); }
+        .btn-danger { background: #ff4757; color: #fff; }
+        .btn-danger:hover { background: #ff6b81; }
+        .btn-sm { padding: 8px 16px; font-size: 13px; }
+        
+        /* 搜索栏 */
+        .filter-bar { background: #fff; padding: 20px; border-radius: 10px; margin-bottom: 20px; display: flex; gap: 15px; flex-wrap: wrap; align-items: center; box-shadow: 0 2px 10px rgba(0,0,0,0.05); }
+        .filter-bar select, .filter-bar input { padding: 10px 15px; border: 1px solid #e0e0e0; border-radius: 6px; font-size: 14px; min-width: 150px; }
+        .filter-bar input { flex: 1; min-width: 200px; }
+        
+        /* 表格 */
+        .table-wrapper { background: #fff; border-radius: 10px; overflow: hidden; box-shadow: 0 2px 10px rgba(0,0,0,0.05); }
+        .data-table { width: 100%; border-collapse: collapse; }
+        .data-table th { background: #f8f9fa; padding: 15px; text-align: left; font-weight: 600; color: #555; font-size: 13px; text-transform: uppercase; }
+        .data-table td { padding: 15px; border-bottom: 1px solid #f0f0f0; font-size: 14px; }
+        .data-table tr:hover { background: #fafafa; }
+        .data-table .checkbox { width: 40px; }
+        
+        /* 状态标签 */
+        .status-tag { padding: 4px 10px; border-radius: 20px; font-size: 12px; }
+        .status-tag.sold { background: #e8f5e9; color: #2e7d32; }
+        .status-tag.unsold { background: #fff3e0; color: #ef6c00; }
+        .status-tag.coming { background: #e3f2fd; color: #1565c0; }
+        .status-tag.yes { background: #e8f5e9; color: #2e7d32; }
+        .status-tag.no { background: #ffebee, color: #c62828; }
+        
+        /* 操作按钮 */
+        .action-btns { display: flex; gap: 8px; }
+        .action-btn { padding: 6px 12px; border: none; border-radius: 4px; cursor: pointer; font-size: 12px; }
+        .edit-btn { background: #e3f2fd; color: #1976d2; }
+        .edit-btn:hover { background: #bbdefb; }
+        .delete-btn { background: #ffebee; color: #c62828; }
+        .delete-btn:hover { background: #ffcdd2; }
+        
+        /* 批量操作 */
+        .batch-actions { display: none; padding: 15px 20px; background: #fff3e0; border-radius: 8px; margin-bottom: 15px; align-items: center; gap: 15px; }
+        .batch-actions.show { display: flex; }
+        
+        /* 分页 */
+        .pagination { display: flex; justify-content: center; gap: 8px; margin-top: 20px; }
+        .page-btn { padding: 8px 14px; border: 1px solid #ddd; background: #fff; border-radius: 4px; cursor: pointer; }
+        .page-btn.active { background: #c9a962; color: #fff; border-color: #c9a962; }
+        
+        /* 弹窗 */
+        .modal-overlay { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.5); display: none; justify-content: center; align-items: center; z-index: 1000; }
+        .modal-overlay.active { display: flex; }
+        .modal { background: #fff; border-radius: 12px; width: 90%; max-width: 600px; max-height: 90vh; overflow: auto; }
+        .modal-header { padding: 20px; border-bottom: 1px solid #eee; display: flex; justify-content: space-between; align-items: center; }
+        .modal-header h3 { margin: 0; font-size: 18px; }
+        .modal-close { background: none; border: none; font-size: 24px; cursor: pointer; color: #999; }
+        .modal-body { padding: 20px; }
+        
+        .form-group { margin-bottom: 20px; }
+        .form-group label { display: block; margin-bottom: 8px; font-weight: 500; color: #333; }
+        .form-group input, .form-group select, .form-group textarea { width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 6px; font-size: 14px; }
+        .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; }
+        .form-actions { display: flex; gap: 10px; justify-content: flex-end; padding-top: 20px; }
+        
+        .empty-state { text-align: center; padding: 60px; color: #999; }
+        
+        /* 图片预览 */
+        .image-preview { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 10px; }
+        .image-preview-item { position: relative; width: 80px; height: 80px; }
+        .image-preview-item img { width: 100%; height: 100%; object-fit: cover; border-radius: 4px; }
+        .remove-btn { position: absolute; top: -5px; right: -5px; width: 20px; height: 20px; background: #ff4757; color: #fff; border-radius: 50%; border: none; cursor: pointer; font-size: 12px; line-height: 1; }
+    </style>
 </head>
 <body>
     <div class="admin-wrapper">
-        <!-- 侧边栏 -->
         <aside class="sidebar">
             <div class="sidebar-header">
                 <img src="../../images/logo.png" alt="嘉孚堂">
                 <h2>后台管理</h2>
             </div>
             <nav class="sidebar-nav">
-                <a href="../dashboard.html" class="nav-item">
-                    <span>📊</span> <span>控制台</span>
-                </a>
-                <a href="collections.html" class="nav-item active">
-                    <span>🎨</span> <span>藏品管理</span>
-                </a>
-                <a href="news.html" class="nav-item">
-                    <span>📰</span> <span>新闻管理</span>
-                </a>
-                <a href="submissions.html" class="nav-item">
-                    <span>📋</span> <span>提交记录</span>
-                </a>
-                <a href="#" onclick="logout(); return false;" class="nav-item">
-                    <span>🚪</span> <span>退出登录</span>
-                </a>
+                <a href="../dashboard.html" class="nav-item"><span>📊</span><span>控制台</span></a>
+                <a href="collections.html" class="nav-item active"><span>🎨</span><span>藏品管理</span></a>
+                <a href="news.html" class="nav-item"><span>📰</span><span>新闻管理</span></a>
+                <a href="submissions.html" class="nav-item"><span>📋</span><span>提交记录</span></a>
+                <a href="#" onclick="logout()" class="nav-item"><span>🚪</span><span>退出登录</span></a>
             </nav>
         </aside>
 
-        <!-- 主内容 -->
         <main class="main-content">
             <div class="page-header">
-                <h1>藏品管理</h1>
-                <button class="btn-sm btn-view" onclick="openModal()">+ 添加藏品</button>
+                <h1>🎨 藏品管理</h1>
+                <button class="btn btn-primary" onclick="openModal()">+ 添加藏品</button>
             </div>
 
-            <!-- 筛选 -->
+            <!-- 批量操作栏 -->
+            <div class="batch-actions" id="batchActions">
+                <span>已选择 <strong id="selectedCount">0</strong> 项</span>
+                <button class="btn btn-danger btn-sm" onclick="batchDelete()">批量删除</button>
+                <button class="btn btn-sm" onclick="clearSelection()">取消选择</button>
+            </div>
+
+            <!-- 搜索筛选 -->
             <div class="filter-bar">
                 <select id="filterCategory" onchange="renderTable()">
                     <option value="">全部分类</option>
@@ -58,19 +143,20 @@
                     <option value="sold">已拍卖</option>
                     <option value="coming">即将拍卖</option>
                 </select>
-                <input type="text" id="searchKeyword" placeholder="搜索藏品..." oninput="renderTable()">
+                <input type="text" id="searchKeyword" placeholder="🔍 搜索藏品名称..." oninput="renderTable()">
             </div>
 
-            <!-- 表格 -->
+            <!-- 数据表格 -->
             <div class="table-wrapper">
                 <table class="data-table">
                     <thead>
                         <tr>
+                            <th class="checkbox"><input type="checkbox" id="selectAll" onchange="toggleSelectAll()"></th>
                             <th>编号</th>
                             <th>名称</th>
                             <th>分类</th>
                             <th>状态</th>
-                            <th>首页推荐</th>
+                            <th>推荐</th>
                             <th>操作</th>
                         </tr>
                     </thead>
@@ -79,18 +165,16 @@
                 </table>
             </div>
 
-            <!-- 分页 -->
-            <div class="pagination" id="pagination">
-            </div>
+            <div class="pagination" id="pagination"></div>
         </main>
     </div>
 
-    <!-- 添加/编辑弹窗 -->
+    <!-- 弹窗 -->
     <div class="modal-overlay" id="collectionModal">
         <div class="modal">
             <div class="modal-header">
                 <h3 id="modalTitle">添加藏品</h3>
-                <button class="modal-close" onclick="closeModal()">&times;</button>
+                <button class="modal-close" onclick="closeModal()">×</button>
             </div>
             <div class="modal-body">
                 <form id="collectionForm">
@@ -98,7 +182,7 @@
                     <div class="form-row">
                         <div class="form-group">
                             <label>藏品名称 *</label>
-                            <input type="text" id="itemTitle" required>
+                            <input type="text" id="itemTitle" required placeholder="请输入藏品名称">
                         </div>
                         <div class="form-group">
                             <label>品类 *</label>
@@ -131,228 +215,301 @@
                         </div>
                     </div>
                     <div class="form-group">
-                        <label>封面图片URL</label>
-                        <input type="text" id="itemCoverImage" placeholder="https://...">
+                        <label>封面图片（上传或输入URL）</label>
+                        <input type="file" id="itemImageFile" accept="image/*" onchange="previewImage(this)">
+                        <div id="imagePreview" style="margin-top:10px;display:none;">
+                            <img id="previewImg" style="max-width:200px;border-radius:4px;">
+                        </div>
+                        <input type="text" id="itemCoverImage" placeholder="图片URL，也可手动输入" style="margin-top:10px;">
                     </div>
                     <div class="form-group">
                         <label>简介</label>
-                        <textarea id="itemSummary" placeholder="简短描述..."></textarea>
+                        <textarea id="itemSummary" rows="2" placeholder="简短描述..."></textarea>
                     </div>
                     <div class="form-group">
-                        <label>详细描述</label>
-                        <textarea id="itemContent" placeholder="详细描述内容..."></textarea>
+                        <label>详细介绍</label>
+                        <textarea id="itemContent" rows="6" placeholder="详细介绍内容..."></textarea>
                     </div>
                     <div class="form-actions">
-                        <button type="button" class="btn-cancel" onclick="closeModal()">取消</button>
-                        <button type="button" class="btn-save" onclick="saveCollection()">保存</button>
+                        <button type="button" class="btn" onclick="closeModal()">取消</button>
+                        <button type="button" class="btn btn-primary" onclick="saveCollection()">保存</button>
                     </div>
                 </form>
             </div>
         </div>
     </div>
 
-    <script src="../js/auth.js"></script>
     <script>
-        let collections = [];
-        let currentPage = 1;
-        const pageSize = 10;
-        
-        // 存储键名
-        const STORAGE_KEY = 'jiafu_collections';
-        
-        // 初始化
-        function init() {
-            loadCollections();
-        }
-        
-        // 加载藏品数据 - 优先从localStorage
-        function loadCollections() {
-            const stored = localStorage.getItem(STORAGE_KEY);
-            if (stored) {
-                try {
-                    collections = JSON.parse(stored);
-                } catch(e) {
-                    collections = getDefaultCollections();
-                }
-            } else {
-                collections = getDefaultCollections();
-                saveToStorage();
-            }
-            renderTable();
-        }
-        
-        // 默认数据
-        function getDefaultCollections() {
-            return [
-                {id:1,title:'清代紫檀木雕福禄寿屏风',category:'antique',status:'sold',coverImage:'https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=400',summary:'清代晚期紫檀木雕',isFeatured:true,sort:1},
-                {id:2,title:'民国粉彩人物故事瓶',category:'antique',status:'coming',coverImage:'https://images.unsplash.com/photo-1565193566173-7a0ee3dbe261?w=400',summary:'民国粉彩名品',isFeatured:true,sort:2},
-                {id:3,title:'明式黄花梨官帽椅',category:'antique',status:'sold',coverImage:'https://images.unsplash.com/photo-1506439773649-6e0eb8cfb237?w=400',summary:'明式家具',isFeatured:false,sort:3},
-                {id:4,title:'宋代建窑兔毫盏',category:'antique',status:'sold',coverImage:'https://images.unsplash.com/photo-1544787219-7f47ccb76574?w=400',summary:'宋代建窑',isFeatured:false,sort:4},
-                {id:5,title:'齐白石《虾趣图》',category:'art',status:'sold',coverImage:'https://images.unsplash.com/photo-1578926288207-a90a5366759d?w=400',summary:'齐白石精品',isFeatured:true,sort:5},
-                {id:6,title:'张大千《山水四条屏》',category:'art',status:'unsold',coverImage:'https://images.unsplash.com/photo-1605883705077-8d3d3cebe78c?w=400',summary:'张大千山水',isFeatured:true,sort:6},
-                {id:7,title:'傅抱石《山水长卷》',category:'art',status:'coming',coverImage:'https://images.unsplash.com/photo-1600636567129-674c947c29b7?w=400',summary:'傅抱石力作',isFeatured:false,sort:7},
-                {id:8,title:'徐悲鸿《奔马图》',category:'art',status:'unsold',coverImage:'https://images.unsplash.com/photo-1518998053901-5348d3961a04?w=400',summary:'徐悲鸿代表作',isFeatured:false,sort:8},
-                {id:9,title:'卡地亚钻石胸针',category:'jewelry',status:'unsold',coverImage:'https://images.unsplash.com/photo-1515562141207-7a88fb7ce338?w=400',summary:'卡地亚',isFeatured:true,sort:9},
-                {id:10,title:'翡翠手镯 玻璃种',category:'jewelry',status:'coming',coverImage:'https://images.unsplash.com/photo-1602751584552-8ba73aad10e1?w=400',summary:'玻璃种翡翠',isFeatured:true,sort:10},
-                {id:11,title:'梵克雅宝钻石项链',category:'jewelry',status:'sold',coverImage:'https://images.unsplash.com/photo-1599643478518-a784e5dc4c8f?w=400',summary:'梵克雅宝',isFeatured:false,sort:11},
-                {id:12,title:'红宝石戒指',category:'jewelry',status:'unsold',coverImage:'https://images.unsplash.com/photo-1605100804763-247f67b3557e?w=400',summary:'鸽血红宝石',isFeatured:false,sort:12},
-                {id:13,title:'第一版人民币全套',category:'coin',status:'sold',coverImage:'https://images.unsplash.com/photo-1621155346337-1d19476ba7d6?w=400',summary:'第一版人民币',isFeatured:true,sort:13},
-                {id:14,title:'文革时期珍邮票',category:'coin',status:'unsold',coverImage:'https://images.unsplash.com/photo-1580196929935-77f7a7a8e389?w=400',summary:'文革邮票',isFeatured:false,sort:14},
-                {id:15,title:'袁大头银元',category:'coin',status:'coming',coverImage:'https://images.unsplash.com/photo-1610375461246-83df859d849d?w=400',summary:'袁大头',isFeatured:false,sort:15},
-                {id:16,title:'古钱币一组',category:'coin',status:'unsold',coverImage:'https://images.unsplash.com/photo-1571752726703-5e7d1f6a986d?w=400',summary:'古钱币',isFeatured:false,sort:16},
-                {id:17,title:'NFT《创世之境》',category:'nft',status:'coming',coverImage:'https://images.unsplash.com/photo-1642104704074-907c0698cbd9?w=400',summary:'数字艺术品',isFeatured:true,sort:17},
-                {id:18,title:'NFT《星际幻想》',category:'nft',status:'unsold',coverImage:'https://images.unsplash.com/photo-1620641788421-7a1c342ea42e?w=400',summary:'限量版NFT',isFeatured:false,sort:18},
-                {id:19,title:'NFT《赛博朋克》',category:'nft',status:'sold',coverImage:'https://images.unsplash.com/photo-1634152962476-4b8a00e1915c?w=400',summary:'赛博朋克',isFeatured:false,sort:19},
-                {id:20,title:'NFT《抽象艺术》',category:'nft',status:'unsold',coverImage:'https://images.unsplash.com/photo-1618005198919-d3d4b5a92ead?w=400',summary:'抽象NFT',isFeatured:false,sort:20},
-                {id:21,title:'19世纪西洋座钟',category:'misc',status:'coming',coverImage:'https://images.unsplash.com/photo-1508057198894-247b23fe5ade?w=400',summary:'西洋座钟',isFeatured:false,sort:21},
-                {id:22,title:'劳力士手表',category:'misc',status:'sold',coverImage:'https://images.unsplash.com/photo-1523170335258-f5ed11844a49?w=400',summary:'劳力士',isFeatured:true,sort:22},
-                {id:23,title:'紫砂壶 名家款',category:'misc',status:'unsold',coverImage:'https://images.unsplash.com/photo-1565193566173-7a0ee3dbe261?w=400',summary:'紫砂壶',isFeatured:false,sort:23},
-                {id:24,title:'沉香手串',category:'misc',status:'coming',coverImage:'https://images.unsplash.com/photo-1611085583191-a3b181a88401?w=400',summary:'沉香',isFeatured:false,sort:24}
-            ];
-        }
-        
-        // 保存到localStorage
-        function saveToStorage() {
-            localStorage.setItem(STORAGE_KEY, JSON.stringify(collections));
-        }
-        
-        // 渲染表格
-        function renderTable() {
-            const category = document.getElementById('filterCategory').value;
-            const status = document.getElementById('filterStatus').value;
-            const keyword = document.getElementById('searchKeyword').value;
-            
-            let filtered = [...collections];
-            
-            if (category) filtered = filtered.filter(c => c.category === category);
-            if (status) filtered = filtered.filter(c => c.status === status);
-            if (keyword) filtered = filtered.filter(c => c.title.includes(keyword) || c.summary.includes(keyword));
-            
-            filtered.sort((a, b) => b.sort - a.sort);
-            
-            const totalPages = Math.ceil(filtered.length / pageSize);
-            const start = (currentPage - 1) * pageSize;
-            const paged = filtered.slice(start, start + pageSize);
-            
-            const tbody = document.getElementById('collectionsTable');
-            if (paged.length === 0) {
-                tbody.innerHTML = '<tr><td colspan="6" class="empty-state">暂无数据</td></tr>';
-            } else {
-                const categoryMap = {art:'艺术品',antique:'古董文物',jewelry:'珠宝奢侈品',coin:'文献邮币',nft:'数字藏品',misc:'杂项'};
-                const statusMap = {unsold:'未拍卖',sold:'已拍卖',coming:'即将拍卖'};
-                
-                tbody.innerHTML = paged.map(c => `
-                    <tr>
-                        <td>${c.sort}</td>
-                        <td>${c.title}</td>
-                        <td>${categoryMap[c.category] || c.category}</td>
-                        <td>${statusMap[c.status] || c.status}</td>
-                        <td>${c.isFeatured ? '✅' : '❌'}</td>
-                        <td>
-                            <button class="btn-sm" onclick="editCollection(${c.id})">编辑</button>
-                            <button class="btn-sm btn-danger" onclick="deleteCollection(${c.id})">删除</button>
-                        </td>
-                    </tr>
-                `).join('');
-            }
-            
-            // 分页
-            const pagination = document.getElementById('pagination');
-            if (totalPages > 1) {
-                let html = '';
-                for (let i = 1; i <= totalPages; i++) {
-                    html += `<button class="${i === currentPage ? 'active' : ''}" onclick="goPage(${i})">${i}</button>`;
-                }
-                pagination.innerHTML = html;
-            } else {
-                pagination.innerHTML = '';
-            }
-        }
-        
-        function goPage(page) {
-            currentPage = page;
-            renderTable();
-        }
-        
-        // 打开弹窗
-        function openModal(id = null) {
-            const modal = document.getElementById('collectionModal');
-            const title = document.getElementById('modalTitle');
-            
-            if (id) {
-                const item = collections.find(c => c.id === id);
-                if (item) {
-                    title.textContent = '编辑藏品';
-                    document.getElementById('collectionId').value = item.id;
-                    document.getElementById('itemTitle').value = item.title;
-                    document.getElementById('itemCategory').value = item.category;
-                    document.getElementById('itemStatus').value = item.status;
-                    document.getElementById('itemFeatured').value = item.isFeatured ? 'true' : 'false';
-                    document.getElementById('itemCoverImage').value = item.coverImage || '';
-                    document.getElementById('itemSummary').value = item.summary || '';
-                    document.getElementById('itemContent').value = item.content || '';
-                }
-            } else {
-                title.textContent = '添加藏品';
-                document.getElementById('collectionForm').reset();
-                document.getElementById('collectionId').value = '';
-            }
-            
-            modal.classList.add('active');
-        }
-        
-        function closeModal() {
-            document.getElementById('collectionModal').classList.remove('active');
-        }
-        
-        // 保存藏品
-        function saveCollection() {
-            const id = document.getElementById('collectionId').value;
-            const data = {
-                title: document.getElementById('itemTitle').value,
-                category: document.getElementById('itemCategory').value,
-                status: document.getElementById('itemStatus').value,
-                isFeatured: document.getElementById('itemFeatured').value === 'true',
-                coverImage: document.getElementById('itemCoverImage').value,
-                summary: document.getElementById('itemSummary').value,
-                content: document.getElementById('itemContent').value
-            };
-            
-            if (!data.title || !data.category) {
-                alert('请填写必填项');
-                return;
-            }
-            
-            if (id) {
-                const index = collections.findIndex(c => c.id === parseInt(id));
-                collections[index] = { ...collections[index], ...data };
-            } else {
-                const newId = collections.length > 0 ? Math.max(...collections.map(c => c.id)) + 1 : 1;
-                collections.push({ id: newId, sort: newId, ...data });
-            }
-            
-            saveToStorage();
-            closeModal();
-            renderTable();
-            alert('保存成功！');
-        }
-        
-        // 编辑藏品
-        function editCollection(id) {
-            openModal(id);
-        }
-        
-        // 删除藏品
-        function deleteCollection(id) {
-            if (confirm('确定要删除这件藏品吗？')) {
-                collections = collections.filter(c => c.id !== id);
-                saveToStorage();
+    const API_URL = 'https://jiafutang-api.dongranranface.workers.dev';
+    const CLOUDINARY_CLOUD = 'dongranranface';
+    let collections = [];
+    let currentPage = 1;
+    const pageSize = 10;
+    let selectedIds = [];
+
+    // 初始化
+    function init() {
+        loadCollections();
+    }
+
+    // 加载数据
+    function loadCollections() {
+        fetch(API_URL + '/api/collections')
+            .then(res => res.json())
+            .then(data => {
+                collections = data || [];
                 renderTable();
+            });
+    }
+
+    // 渲染表格
+    function renderTable() {
+        const category = document.getElementById('filterCategory').value;
+        const status = document.getElementById('filterStatus').value;
+        const keyword = document.getElementById('searchKeyword').value.toLowerCase();
+        
+        let filtered = collections.filter(c => {
+            if (category && c.category !== category) return false;
+            if (status && c.status !== status) return false;
+            if (keyword && !c.title.toLowerCase().includes(keyword)) return false;
+            return true;
+        });
+        
+        filtered.sort((a,b) => b.sort - a.sort);
+        
+        const totalPages = Math.ceil(filtered.length / pageSize);
+        const start = (currentPage - 1) * pageSize;
+        const paged = filtered.slice(start, start + pageSize);
+        
+        const categoryMap = {art:'艺术品',antique:'古董文物',jewelry:'珠宝奢侈品',coin:'文献邮币',nft:'数字藏品',misc:'杂项'};
+        const statusMap = {sold:'已拍卖',unsold:'未拍卖',coming:'即将拍卖'};
+        
+        const tbody = document.getElementById('collectionsTable');
+        if (paged.length === 0) {
+            tbody.innerHTML = '<tr><td colspan="7" class="empty-state">暂无数据</td></tr>';
+        } else {
+            tbody.innerHTML = paged.map(c => {
+                const isSelected = selectedIds.includes(c.id);
+                return '<tr>' +
+                    '<td class="checkbox"><input type="checkbox" ' + (isSelected ? 'checked' : '') + ' onchange="toggleSelect(' + c.id + ')"></td>' +
+                    '<td>' + c.id + '</td>' +
+                    '<td><strong>' + c.title + '</strong></td>' +
+                    '<td><span class="status-tag">' + (categoryMap[c.category] || c.category) + '</span></td>' +
+                    '<td><span class="status-tag ' + c.status + '">' + statusMap[c.status] + '</span></td>' +
+                    '<td><span class="status-tag ' + (c.is_featured ? 'yes' : 'no') + '">' + (c.is_featured ? '✓' : '✗') + '</span></td>' +
+                    '<td><div class="action-btns">' +
+                    '<button class="action-btn edit-btn" onclick="editCollection(' + c.id + ')">编辑</button>' +
+                    '<button class="action-btn delete-btn" onclick="deleteCollection(' + c.id + ')">删除</button></div></td>' +
+                '</tr>';
+            }).join('');
+        }
+        
+        // 更新批量操作栏
+        updateBatchActions();
+        
+        // 渲染分页
+        renderPagination(totalPages);
+    }
+
+    // 分页
+    function renderPagination(totalPages) {
+        if (totalPages <= 1) {
+            document.getElementById('pagination').innerHTML = '';
+            return;
+        }
+        let html = '';
+        for (let i = 1; i <= totalPages; i++) {
+            html += '<button class="page-btn' + (i === currentPage ? ' active' : '') + '" onclick="goPage(' + i + ')">' + i + '</button>';
+        }
+        document.getElementById('pagination').innerHTML = html;
+    }
+
+    function goPage(page) {
+        currentPage = page;
+        renderTable();
+    }
+
+    // 全选
+    function toggleSelectAll() {
+        const checked = document.getElementById('selectAll').checked;
+        if (checked) {
+            selectedIds = collections.map(c => c.id);
+        } else {
+            selectedIds = [];
+        }
+        renderTable();
+    }
+
+    function toggleSelect(id) {
+        if (selectedIds.includes(id)) {
+            selectedIds = selectedIds.filter(i => i !== id);
+        } else {
+            selectedIds.push(id);
+        }
+        renderTable();
+    }
+
+    function updateBatchActions() {
+        const el = document.getElementById('batchActions');
+        document.getElementById('selectedCount').textContent = selectedIds.length;
+        el.classList.toggle('show', selectedIds.length > 0);
+    }
+
+    function clearSelection() {
+        selectedIds = [];
+        renderTable();
+    }
+
+    // 批量删除
+    function batchDelete() {
+        if (!confirm('确定要删除选中的 ' + selectedIds.length + ' 条藏品吗？')) return;
+        Promise.all(selectedIds.map(id => 
+            fetch(API_URL + '/api/collections/' + id, {method:'DELETE'}).then(r=>r.json())
+        )).then(() => {
+            selectedIds = [];
+            loadCollections();
+            alert('批量删除成功！');
+        });
+    }
+
+    // 弹窗
+    function openModal(id) {
+        document.getElementById('collectionModal').classList.add('active');
+        document.getElementById('modalTitle').textContent = id ? '编辑藏品' : '添加藏品';
+        document.getElementById('collectionId').value = id || '';
+        document.getElementById('collectionForm').reset();
+        document.getElementById('imagePreview').style.display = 'none';
+        
+        if (id) {
+            const c = collections.find(x => x.id === id);
+            if (c) {
+                document.getElementById('itemTitle').value = c.title || '';
+                document.getElementById('itemCategory').value = c.category || '';
+                document.getElementById('itemStatus').value = c.status || '';
+                document.getElementById('itemFeatured').value = c.is_featured ? 'true' : 'false';
+                document.getElementById('itemCoverImage').value = c.cover_image || '';
+                document.getElementById('itemSummary').value = c.summary || '';
+                document.getElementById('itemContent').value = c.content || '';
+                // 显示图片预览
+                if (c.cover_image) {
+                    document.getElementById('previewImg').src = c.cover_image;
+                    document.getElementById('imagePreview').style.display = 'block';
+                }
+            }
+        }
+    }
+
+    // 图片预览
+    function previewImage(input) {
+        if (input.files && input.files[0]) {
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                document.getElementById('previewImg').src = e.target.result;
+                document.getElementById('imagePreview').style.display = 'block';
+                // 同时设置URL输入框
+                document.getElementById('itemCoverImage').value = e.target.result;
+            };
+            reader.readAsDataURL(input.files[0]);
+        }
+    }
+
+    // 上传图片到Cloudinary
+    async function uploadImage(file) {
+        return new Promise((resolve, reject) => {
+            const reader = new FileReader();
+            reader.onload = async function(e) {
+                try {
+                    const formData = new FormData();
+                    formData.append('file', e.target.result);
+                    formData.append('upload_preset', 'ml_default');
+                    
+                    const res = await fetch('https://api.cloudinary.com/v1_1/dongranranface/image/upload', {
+                        method: 'POST',
+                        body: formData
+                    });
+                    const data = await res.json();
+                    if (data.secure_url) {
+                        resolve(data.secure_url);
+                    } else {
+                        reject(new Error('Upload failed'));
+                    }
+                } catch(err) {
+                    reject(err);
+                }
+            };
+            reader.onerror = reject;
+            reader.readAsDataURL(file);
+        });
+    }
+
+    function closeModal() {
+        document.getElementById('collectionModal').classList.remove('active');
+    }
+
+    function editCollection(id) {
+        openModal(id);
+    }
+
+    // 保存
+    async function saveCollection() {
+        const id = document.getElementById('collectionId').value;
+        const fileInput = document.getElementById('itemImageFile');
+        let coverImage = document.getElementById('itemCoverImage').value;
+        
+        // 如果选择了新文件，先上传
+        if (fileInput.files && fileInput.files[0]) {
+            try {
+                coverImage = await uploadImage(fileInput.files[0]);
+            } catch(e) {
+                alert('图片上传失败，将使用输入的URL');
             }
         }
         
-        // 初始化
-        init();
+        const data = {
+            title: document.getElementById('itemTitle').value,
+            category: document.getElementById('itemCategory').value,
+            status: document.getElementById('itemStatus').value,
+            is_featured: document.getElementById('itemFeatured').value === 'true',
+            cover_image: coverImage || 'https://images.unsplash.com/photo-1578926288207-a90a5366759d?w=400',
+            summary: document.getElementById('itemSummary').value,
+            content: document.getElementById('itemContent').value,
+            sort: id ? parseInt(id) : (collections.length + 1)
+        };
+        
+        if (!data.title || !data.category) {
+            alert('请填写必填项');
+            return;
+        }
+        
+        const method = id ? 'PUT' : 'POST';
+        const url = id ? API_URL + '/api/collections/' + id : API_URL + '/api/collections';
+        
+        fetch(url, {
+            method: method,
+            headers: {'Content-Type':'application/json'},
+            body: JSON.stringify(data)
+        }).then(res => res.json()).then(result => {
+            closeModal();
+            loadCollections();
+            alert('保存成功！');
+        });
+    }
+
+    // 删除
+    function deleteCollection(id) {
+        if (!confirm('确定要删除这件藏品吗？')) return;
+        fetch(API_URL + '/api/collections/' + id, {method:'DELETE'})
+            .then(res => res.json()).then(result => {
+                loadCollections();
+                alert('删除成功！');
+            });
+    }
+
+    function logout() {
+        window.location.href = '../index.html';
+    }
+
+    init();
     </script>
 </body>
 </html>

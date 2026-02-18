@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html>
+<head><title>添加新闻</title></head>
+<body>
+<h2>正在添加新闻...</h2>
+<script>
+const API = 'https://jiafutang-api.dongranranface.workers.dev/api/news';
+const newsList = [
+    {title:'2026年春季艺术品拍卖市场分析',category:'industry',cover_image:'https://images.unsplash.com/photo-1578926288207-a90a5366759d?w=400',summary:'春季拍卖成绩单出炉，书画板块表现亮眼瓷器杂项热度上升',is_top:true,sort:1},
+    {title:'古董瓷器成投资新宠 宋代瓷器成交创新高',category:'industry',cover_image:'https://images.unsplash.com/photo-1565193566173-7a0ee3dbe261?w=400',summary:'宋代五大名窑瓷器市场行情持续上涨，成为投资热点',is_top:false,sort:2},
+    {title:'收藏市场持续升温 成交创新高',category:'industry',cover_image:'https://images.unsplash.com/photo-1578926288207-a90a5366759d?w=400',summary:'高端艺术品市场需求旺盛，成交量稳步增长',is_top:false,sort:3},
+    {title:'书画板块强势复苏 名家精品屡创新高',category:'industry',cover_image:'https://images.unsplash.com/photo-1605883705077-8d3d3cebe78c?w=400',summary:'近现代书画行情看涨，齐白石张大千作品受追捧',is_top:false,sort:4},
+    {title:'NFT市场逐步回归理性 价值投资成主流',category:'industry',cover_image:'https://images.unsplash.com/photo-1642104704074-907c0698cbd9?w=400',summary:'数字藏品市场经历调整后，优质NFT更受关注',is_top:false,sort:5},
+    {title:'区块链技术助力艺术品确权 收藏新方式',category:'industry',cover_image:'https://images.unsplash.com/photo-1620641788421-7a1c342ea42e?w=400',summary:'NFT+实体艺术品模式兴起，解决收藏品真伪难题',is_top:false,sort:6},
+    {title:'嘉孚堂入驻海口国际艺术品保税港',category:'brand',cover_image:'https://images.unsplash.com/photo-1578926288207-a90a5366759d?w=400',summary:'打造海南艺术品交易新地标，助力文化交流',is_top:true,sort:7},
+    {title:'嘉孚堂2026年度征集启动 面向全球征集古董瓷器',category:'brand',cover_image:'https://images.unsplash.com/photo-1565193566173-7a0ee3dbe261?w=400',summary:'我们致力于发现更多民间珍宝，让艺术走进生活',is_top:false,sort:8}
+];
+
+async function addNews() {
+    for (const n of newsList) {
+        try {
+            const res = await fetch(API, {
+                method: 'POST',
+                headers: {'Content-Type':'application/json'},
+                body: JSON.stringify(n)
+            });
+            console.log(n.title, await res.json());
+        } catch(e) {
+            console.error(n.title, e);
+        }
+    }
+    document.body.innerHTML = '<h2>添加完成！共 ' + newsList.length + ' 条新闻</h2>';
+}
+addNews();
+</script>
+</body>
+</html>

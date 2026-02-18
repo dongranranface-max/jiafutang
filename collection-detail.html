@@ -102,12 +102,15 @@
         </div>
     </footer>
 
-    <script src="js/data.js"></script>
-    <script src="js/main.js"></script>
+    <script src="js/data.js?v=20260218"></script>
+    <script src="js/main.js?v=20260218"></script>
     <script>
         document.addEventListener('DOMContentLoaded', function() {
             initHeader();
-            loadCollectionDetail();
+            // 等待数据加载
+            setTimeout(function() {
+                loadCollectionDetail();
+            }, 600);
         });
         
         function initHeader() {
@@ -131,8 +134,8 @@
             const id = parseInt(getUrlParam('id')) || 1;
             const item = collections.find(c => c.id === id) || collections[0];
             
-            // 主图
-            document.getElementById('collectionMainImage').src = item.images[0] || item.coverImage;
+            // 主图 - 使用 cover_image 字段
+            document.getElementById('collectionMainImage').src = item.cover_image || item.coverImage;
             document.getElementById('collectionTitle').textContent = item.title;
             
             // 状态
@@ -143,16 +146,16 @@
             // 元信息
             document.getElementById('collectionCategory').textContent = COLLECTION_CATEGORIES[item.category];
             document.getElementById('collectionId').textContent = String(item.id).padStart(3, '0');
-            document.getElementById('collectionDesc').textContent = item.content || item.summary;
+            document.getElementById('collectionDesc').textContent = item.summary || item.content || '';
             
-            // 缩略图
+            // 缩略图 - 使用 cover_image
             const thumbsContainer = document.getElementById('collectionThumbs');
-            const images = item.images.length > 0 ? item.images : [item.coverImage];
-            thumbsContainer.innerHTML = images.map((img, index) => `
-                <div class="collection-thumb ${index === 0 ? 'active' : ''}" data-index="${index}">
-                    <img src="${img}" alt="缩略图${index + 1}">
+            const coverImg = item.cover_image || item.coverImage;
+            thumbsContainer.innerHTML = `
+                <div class="collection-thumb active" data-index="0">
+                    <img src="${coverImg}" alt="封面图片">
                 </div>
-            `).join('');
+            `;
             
             // 缩略图点击切换
             thumbsContainer.querySelectorAll('.collection-thumb').forEach(thumb => {
@@ -170,7 +173,7 @@
             relatedGrid.innerHTML = related.map(c => `
                 <div class="collection-card" onclick="window.location.href='collection-detail.html?id=${c.id}'">
                     <div class="card-image">
-                        <img src="${c.coverImage}" alt="${c.title}" loading="lazy">
+                        <img src="${c.cover_image || c.coverImage}" alt="${c.title}" loading="lazy">
                         <span class="card-status ${c.status}">${COLLECTION_STATUS[c.status]}</span>
                     </div>
                     <div class="card-content">

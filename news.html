@@ -5,6 +5,10 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>新闻动态 - 嘉孚堂</title>
     <meta name="description" content="嘉孚堂新闻动态，行业资讯，活动信息">
+    <meta property="og:title" content="新闻动态 - 嘉孚堂">
+    <meta property="og:description" content="嘉孚堂新闻动态，行业资讯，活动信息">
+    <meta property="og:image" content="https://jiafutang.pages.dev/images/logo.png">
+    <meta property="og:type" content="website">
     <link rel="stylesheet" href="css/style.css">
     <link rel="icon" type="image/x-icon" href="favicon.ico">
     <link rel="apple-touch-icon" href="favicon.ico">
@@ -12,7 +16,7 @@
 </head>
 <body>
     <!-- Header -->
-    <header class="header scrolled" id="header">
+    <header class="header" id="header">
         <div class="container header-inner">
             <a href="index.html" class="logo">
                 <img src="images/logo.png" alt="嘉孚堂" class="logo-img">
@@ -96,31 +100,8 @@
         </div>
     </footer>
 
+    </footer>
+
     <script src="js/data.js"></script>
-    <script src="js/main.js"></script>
-    <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            initNewsFilter();
-            loadNews();
-        });
-        
-        function initNewsFilter() {
-            const filterBtns = document.querySelectorAll('.filter-tabs .filter-btn');
-            filterBtns.forEach(btn => {
-                btn.addEventListener('click', function() {
-                    filterBtns.forEach(b => b.classList.remove('active'));
-                    this.classList.add('active');
-                    loadNews();
-                });
-            });
-            
-            const searchBtn = document.getElementById('newsSearchBtn');
-            const searchInput = document.getElementById('newsSearchInput');
-            if (searchBtn) searchBtn.addEventListener('click', loadNews);
-            if (searchInput) searchInput.addEventListener('keypress', function(e) {
-                if (e.key === 'Enter') loadNews();
-            });
-        }
-    </script>
 </body>
 </html>

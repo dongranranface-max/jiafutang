@@ -1,0 +1,8 @@
+name = "jiafutang-api"
+main = "worker.js"
+compatibility_date = "2024-01-01"
+
+[[d1_databases]]
+binding = "jiafutang_db"
+database_name = "jiafutang-db"
+database_id = "82f24d02-8c22-499f-b822-d28532c2a72b"
