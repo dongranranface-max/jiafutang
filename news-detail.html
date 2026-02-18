@@ -86,9 +86,12 @@
         </div>
     </footer>
 
-    <script src="js/data.js?v=20260218"></script>
-    <script src="js/main.js?v=20260218"></script>
     <script>
+        const API_URL = 'https://jiafutang-api.dongranranface.workers.dev';
+        const NEWS_CATEGORIES = { all: '全部', brand: '嘉孚堂动态', industry: '行业动态' };
+        
+        let news = [];
+        
         document.addEventListener('DOMContentLoaded', function() {
             initHeader();
             loadNewsDetail();
@@ -111,32 +114,53 @@
             }
         }
         
-        function loadNewsDetail() {
-            const id = parseInt(getUrlParam('id')) || 1;
-            const item = news.find(n => n.id === id) || news[0];
-            
-            document.getElementById('newsCategory').textContent = NEWS_CATEGORIES[item.category];
-            document.getElementById('newsTitle').textContent = item.title;
-            document.getElementById('newsMeta').textContent = '发布时间：' + new Date(item.publishAt).toLocaleDateString('zh-CN');
-            document.getElementById('newsCover').src = item.coverImage;
-            document.getElementById('newsContent').innerHTML = item.content;
-            
-            // 上下篇
-            const currentIndex = news.findIndex(n => n.id === item.id);
-            const prevNews = news[currentIndex - 1];
-            const nextNews = news[currentIndex + 1];
-            
-            let navHtml = '';
-            if (prevNews) {
-                navHtml += `<a href="news-detail.html?id=${prevNews.id}">← 上一篇：${prevNews.title}</a>`;
+        async function loadNewsDetail() {
+            try {
+                const res = await fetch(API_URL + '/api/news');
+                news = await res.json();
+                
+                const id = parseInt(getUrlParam('id')) || 1;
+                const item = news.find(n => n.id === id) || news[0];
+                
+                if (!item) {
+                    document.getElementById('newsContent').innerHTML = '<p>新闻不存在</p>';
+                    return;
+                }
+                
+                document.getElementById('newsCategory').textContent = NEWS_CATEGORIES[item.category] || '行业动态';
+                document.getElementById('newsTitle').textContent = item.title;
+                document.getElementById('newsMeta').textContent = '发布时间：' + (item.created_at ? new Date(item.created_at).toLocaleDateString('zh-CN') : '最近');
+                document.getElementById('newsCover').src = item.cover_image;
+                
+                // 内容处理 - 支持换行
+                const content = item.content || item.summary || '';
+                document.getElementById('newsContent').innerHTML = content.replace(/\n/g, '<br>');
+                
+                // 上下篇
+                const currentIndex = news.findIndex(n => n.id === item.id);
+                const prevNews = news[currentIndex - 1];
+                const nextNews = news[currentIndex + 1];
+                
+                let navHtml = '';
+                if (prevNews) {
+                    navHtml += `<a href="news-detail.html?id=${prevNews.id}">← 上一篇：${prevNews.title}</a>`;
+                }
+                if (nextNews) {
+                    navHtml += `<a href="news-detail.html?id=${nextNews.id}">下一篇：${nextNews.title} →</a>`;
+                }
+                if (!prevNews && !nextNews) {
+                    navHtml = '<span>暂无其他新闻</span>';
+                }
+                document.getElementById('newsNav').innerHTML = navHtml;
+            } catch(e) {
+                console.error('加载失败:', e);
+                document.getElementById('newsContent').innerHTML = '<p>加载失败，请刷新页面</p>';
             }
-            if (nextNews) {
-                navHtml += `<a href="news-detail.html?id=${nextNews.id}">下一篇：${nextNews.title} →</a>`;
-            }
-            if (!prevNews && !nextNews) {
-                navHtml = '<span>暂无其他新闻</span>';
-            }
-            document.getElementById('newsNav').innerHTML = navHtml;
+        }
+        
+        function getUrlParam(name) {
+            const params = new URLSearchParams(window.location.search);
+            return params.get(name);
         }
     </script>
 </body>
