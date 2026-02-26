@@ -159,8 +159,8 @@
         </main>
     </div>
 
+    <script src="js/api.js"></script>
     <script>
-    const API_URL = 'https://jiafutang-api.dongranranface.workers.dev';
     let stats = { collections: 0, news: 0, submissions: 0, sold: 0 };
 
     // 初始化
@@ -172,13 +172,10 @@
     async function loadStats() {
         try {
             // 并行请求
-            const [collectionsRes, newsRes] = await Promise.all([
-                fetch(API_URL + '/api/collections'),
-                fetch(API_URL + '/api/news')
+            const [collections, news] = await Promise.all([
+                getCollections(),
+                getNews()
             ]);
-            
-            let collections = await collectionsRes.json();
-            let news = await newsRes.json();
             
             // 确保是数组
             if (!Array.isArray(collections)) collections = [];

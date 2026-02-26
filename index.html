@@ -14,6 +14,111 @@
     <link rel="apple-touch-icon" href="favicon.ico">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;1,300;1,400&family=Montserrat:wght@400;500;600&family=Noto+Sans+SC:wght@400;500&family=Noto+Serif+SC:wght@400;500&display=swap" rel="stylesheet">
+    <style>
+        /* ========== 字体增强样式 ========== */
+        
+        /* 标题字体效果 */
+        h1, h2, h3, h4, h5, h6 {
+            font-family: "Noto Serif SC", "Source Han Serif SC", serif;
+            font-weight: 600;
+            line-height: 1.35;
+            color: #1a1a1a;
+            letter-spacing: 0.02em;
+        }
+        
+        /* 大标题特殊效果 */
+        .hero-title, .page-header h1 {
+            font-family: "Noto Serif SC", "Source Han Serif SC", serif;
+            font-weight: 700;
+            letter-spacing: 0.08em;
+            text-shadow: 0 2px 10px rgba(0,0,0,0.15);
+        }
+        
+        /* 副标题 */
+        .hero-subtitle, .page-header p, .section-subtitle {
+            font-family: "Noto Sans SC", "Source Han Sans SC", sans-serif;
+            font-weight: 400;
+            letter-spacing: 0.05em;
+            opacity: 0.9;
+        }
+        
+        /* 卡片标题 */
+        .card-title, .news-title, .collection-title {
+            font-family: "Noto Serif SC", "Source Han Serif SC", serif;
+            font-weight: 600;
+            line-height: 1.4;
+            letter-spacing: 0.01em;
+        }
+        
+        /* 按钮文字 */
+        .btn {
+            font-family: "Noto Sans SC", "Source Han Sans SC", sans-serif;
+            font-weight: 500;
+            letter-spacing: 0.1em;
+            text-transform: uppercase;
+        }
+        
+        /* 导航文字增强 */
+        .nav-link {
+            font-family: "Noto Sans SC", "Source Han Sans SC", sans-serif;
+            font-weight: 500;
+            letter-spacing: 0.08em;
+        }
+        
+        /* 强调文字 */
+        .highlight-text {
+            font-family: "Noto Serif SC", serif;
+            font-weight: 500;
+            background: linear-gradient(120deg, var(--color-primary) 0%, var(--color-gold) 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        
+        /* 数字字体 */
+        .stat-number, .price, .year {
+            font-family: "Noto Serif SC", "Source Han Serif SC", serif;
+            font-weight: 700;
+            font-variant-numeric: tabular-nums;
+        }
+        
+        /* 正文优化 */
+        p, .desc, .content {
+            font-family: "Noto Sans SC", "Source Han Sans SC", sans-serif;
+            font-weight: 400;
+            line-height: 1.85;
+            letter-spacing: 0.02em;
+            text-align: justify;
+        }
+        
+        /* 小字体 */
+        .meta, .tag, .label, .caption {
+            font-family: "Noto Sans SC", "Source Han Sans SC", sans-serif;
+            font-weight: 500;
+            letter-spacing: 0.05em;
+        }
+        
+        /* 装饰性英文 */
+        .english-text {
+            font-family: "Montserrat", "Noto Sans SC", sans-serif;
+            font-weight: 400;
+            letter-spacing: 0.15em;
+            text-transform: uppercase;
+        }
+        
+        /* 字体平滑 */
+        body {
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+            text-rendering: optimizeLegibility;
+        }
+        
+        /* 选中颜色 */
+        ::selection {
+            background: rgba(184, 134, 11, 0.3);
+            color: #1a1a1a;
+        }
+    </style>
 </head>
 <body>
     <!-- Header -->
@@ -34,6 +139,7 @@
                 <span></span>
                 <span></span>
             </button>
+            <div class="nav-overlay" id="navOverlay"></div>
         </div>
     </header>
 

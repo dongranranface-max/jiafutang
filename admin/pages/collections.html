@@ -239,8 +239,8 @@
         </div>
     </div>
 
+    <script src="../js/api.js"></script>
     <script>
-    const API_URL = 'https://jiafutang-api.dongranranface.workers.dev';
     const CLOUDINARY_CLOUD = 'dongranranface';
     let collections = [];
     let currentPage = 1;
@@ -253,13 +253,14 @@
     }
 
     // 加载数据
-    function loadCollections() {
-        fetch(API_URL + '/api/collections')
-            .then(res => res.json())
-            .then(data => {
-                collections = data || [];
-                renderTable();
-            });
+    async function loadCollections() {
+        try {
+            collections = await getCollections();
+            renderTable();
+        } catch(e) {
+            console.error('加载失败:', e);
+            alert('加载数据失败，请检查网络');
+        }
     }
 
     // 渲染表格
@@ -361,15 +362,20 @@
     }
 
     // 批量删除
-    function batchDelete() {
+    async function batchDelete() {
         if (!confirm('确定要删除选中的 ' + selectedIds.length + ' 条藏品吗？')) return;
-        Promise.all(selectedIds.map(id => 
-            fetch(API_URL + '/api/collections/' + id, {method:'DELETE'}).then(r=>r.json())
-        )).then(() => {
+        
+        try {
+            for (const id of selectedIds) {
+                await deleteCollection(id);
+            }
             selectedIds = [];
-            loadCollections();
+            await loadCollections();
             alert('批量删除成功！');
-        });
+        } catch(e) {
+            console.error('批量删除失败:', e);
+            alert('删除失败: ' + e.message);
+        }
     }
 
     // 弹窗
@@ -421,7 +427,8 @@
                 try {
                     const formData = new FormData();
                     formData.append('file', e.target.result);
-                    formData.append('upload_preset', 'ml_default');
+                    // 修复：使用正确的 preset
+                    formData.append('upload_preset', 'jiafutang');
                     
                     const res = await fetch('https://api.cloudinary.com/v1_1/dongranranface/image/upload', {
                         method: 'POST',
@@ -481,28 +488,38 @@
             return;
         }
         
-        const method = id ? 'PUT' : 'POST';
-        const url = id ? API_URL + '/api/collections/' + id : API_URL + '/api/collections';
-        
-        fetch(url, {
-            method: method,
-            headers: {'Content-Type':'application/json'},
-            body: JSON.stringify(data)
-        }).then(res => res.json()).then(result => {
+        try {
+            if (id) {
+                await updateCollection(id, data);
+            } else {
+                await createCollection(data);
+            }
             closeModal();
-            loadCollections();
+            await loadCollections();
             alert('保存成功！');
-        });
+        } catch(e) {
+            console.error('保存失败:', e);
+            alert('保存失败: ' + e.message);
+        }
     }
 
     // 删除
-    function deleteCollection(id) {
+    async function deleteCollection(id) {
         if (!confirm('确定要删除这件藏品吗？')) return;
-        fetch(API_URL + '/api/collections/' + id, {method:'DELETE'})
-            .then(res => res.json()).then(result => {
-                loadCollections();
-                alert('删除成功！');
-            });
+        try {
+            await deleteCollectionAPI(id);
+            await loadCollections();
+            alert('删除成功！');
+        } catch(e) {
+            console.error('删除失败:', e);
+            alert('删除失败: ' + e.message);
+        }
+    }
+    
+    // 单独删除函数（避免命名冲突）
+    async function deleteCollectionAPI(id) {
+        const res = await signedFetch(`${API_CONFIG.baseUrl}/api/collections/${id}`, {method:'DELETE'});
+        return res.json();
     }
 
     function logout() {

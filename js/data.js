@@ -2,7 +2,8 @@
 // 嘉孚堂官网 - 完整脚本
 // ===================================
 
-const API_URL = 'https://jiafutang-api.dongranranface.workers.dev';
+// API 地址 - 使用 Workers API
+const API_URL = 'https://jiafutang.dongranranface.workers.dev';
 
 var collections = [];
 var news = [];
@@ -33,9 +34,35 @@ async function loadData() {
         initFilters();
         initHeader();
         initHeroSlider();
+        // 首页加载完成后，初始化新闻卡片点击事件
+        if (document.getElementById('homeNewsGrid')) {
+            initHomeNewsClickEvents();
+        }
     } catch(e) {
         console.error('加载失败:', e);
     }
+}
+
+// 首页新闻点击事件初始化
+function initHomeNewsClickEvents() {
+    const grid = document.getElementById('homeNewsGrid');
+    if (!grid) return;
+    
+    // 延迟等待 DOM 渲染完成
+    setTimeout(() => {
+        grid.querySelectorAll('.news-card').forEach((card, index) => {
+            // 避免重复绑定
+            if (card.dataset.clickBound) return;
+            card.dataset.clickBound = 'true';
+            
+            card.addEventListener('click', function() {
+                const id = news[index]?.id || news[index]?.id;
+                if (id) {
+                    window.location.href = `news-detail.html?id=${id}`;
+                }
+            });
+        });
+    }, 100);
 }
 
 // ============ 页面渲染 ============
@@ -107,7 +134,7 @@ function renderNews() {
 // ============ 组件创建 ============
 function createCollectionCard(item, showStatus = true) {
     const statusHtml = showStatus ? '<span class="card-status ' + item.status + '">' + COLLECTION_STATUS[item.status] + '</span>' : '';
-    return '<div class="collection-card" style="background:#fff;border-radius:12px;overflow:hidden;box-shadow:0 4px 20px rgba(0,0,0,0.08);transition:transform 0.3s;">' +
+    return '<div class="collection-card" id="collection-card-' + item.id + '" data-id="' + item.id + '" style="background:#fff;border-radius:12px;overflow:hidden;box-shadow:0 4px 20px rgba(0,0,0,0.08);transition:transform 0.3s;cursor:pointer;">' +
         '<div style="position:relative;aspect-ratio:4/3;overflow:hidden;">' +
         '<img src="' + item.cover_image + '" alt="' + item.title + '" style="width:100%;height:100%;object-fit:cover;">' +
         statusHtml +
@@ -119,7 +146,8 @@ function createCollectionCard(item, showStatus = true) {
 }
 
 function createNewsCard(item) {
-    return '<div class="news-card" style="background:#fff;border-radius:12px;overflow:hidden;box-shadow:0 4px 20px rgba(0,0,0,0.08);transition:transform 0.3s;cursor:pointer;" onclick="window.location.href=\'news-detail.html?id=' + item.id + '\'">' +
+    var newsId = item.id;
+    return '<div class="news-card" id="news-card-' + newsId + '" data-id="' + newsId + '" style="background:#fff;border-radius:12px;overflow:hidden;box-shadow:0 4px 20px rgba(0,0,0,0.08);transition:transform 0.3s;cursor:pointer;">' +
         '<div style="aspect-ratio:16/9;overflow:hidden;">' +
         '<img src="' + item.cover_image + '" alt="' + item.title + '" style="width:100%;height:100%;object-fit:cover;">' +
         '</div>' +
@@ -129,6 +157,53 @@ function createNewsCard(item) {
         '<p style="font-size:14px;color:#888;line-height:1.6;">' + (item.summary||'') + '</p>' +
         '</div></div>';
 }
+
+// 为新闻卡片添加点击事件（使用事件委托）
+document.addEventListener('DOMContentLoaded', function() {
+    // 藏品卡片点击 - 跳转详情页
+    document.getElementById('collectionGrid')?.addEventListener('click', function(e) {
+        var card = e.target.closest('.collection-card');
+        if (card) {
+            var id = card.dataset.id;
+            if (id) {
+                window.location.href = 'collection-detail.html?id=' + id;
+            }
+        }
+    });
+    
+    // 首页精选藏品点击
+    document.getElementById('featuredGrid')?.addEventListener('click', function(e) {
+        var card = e.target.closest('.collection-card');
+        if (card) {
+            var id = card.dataset.id;
+            if (id) {
+                window.location.href = 'collection-detail.html?id=' + id;
+            }
+        }
+    });
+    
+    // 新闻卡片点击
+    document.getElementById('newsListGrid')?.addEventListener('click', function(e) {
+        var card = e.target.closest('.news-card');
+        if (card) {
+            var newsId = card.dataset.id;
+            if (newsId) {
+                window.location.href = 'news-detail.html?id=' + newsId;
+            }
+        }
+    });
+    
+    // 首页新闻卡片点击
+    document.getElementById('homeNewsGrid')?.addEventListener('click', function(e) {
+        var card = e.target.closest('.news-card');
+        if (card) {
+            var newsId = card.dataset.id;
+            if (newsId) {
+                window.location.href = 'news-detail.html?id=' + newsId;
+            }
+        }
+    });
+});
 
 // ============ 初始化功能 ============
 function initFilters() {

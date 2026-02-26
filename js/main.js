@@ -12,13 +12,27 @@
             e.preventDefault();
             hamburger.classList.toggle('active');
             nav.classList.toggle('active');
+            // 切换遮罩层
+            const overlay = document.getElementById('navOverlay');
+            if (overlay) overlay.classList.toggle('active');
         });
+        
+        // 点击遮罩层关闭菜单
+        const overlay = document.getElementById('navOverlay');
+        if (overlay) {
+            overlay.addEventListener('click', function() {
+                hamburger.classList.remove('active');
+                nav.classList.remove('active');
+                overlay.classList.remove('active');
+            });
+        }
         
         // 点击导航链接关闭菜单
         nav.querySelectorAll('.nav-link').forEach(link => {
             link.addEventListener('click', function() {
                 hamburger.classList.remove('active');
                 nav.classList.remove('active');
+                if (overlay) overlay.classList.remove('active');
             });
         });
         
@@ -237,6 +251,13 @@ function loadFeaturedCollections(category = 'all', keyword = '') {
     const grid = document.getElementById('featuredGrid');
     if (!grid) return;
     
+    // 确保数据已加载
+    if (!collections || collections.length === 0) {
+        grid.innerHTML = '<p style="text-align:center;padding:40px;">加载中...</p>';
+        setTimeout(() => loadFeaturedCollections(category, keyword), 500);
+        return;
+    }
+    
     // 如果数据为空，显示加载中
     if (!collections || collections.length === 0) {
         grid.innerHTML = '<p style="text-align:center;padding:40px;">加载中...</p>';
@@ -276,9 +297,11 @@ function loadHomeNews(category = 'all') {
     const grid = document.getElementById('homeNewsGrid');
     if (!grid) return;
     
-    // 如果数据为空，显示加载中
+    // 如果数据为空，显示加载中并尝试重新加载
     if (!news || news.length === 0) {
         grid.innerHTML = '<p style="text-align:center;padding:40px;">加载中...</p>';
+        // 延迟后重试
+        setTimeout(() => loadHomeNews(category), 500);
         return;
     }
     
@@ -519,6 +542,16 @@ function loadCollections(category = 'all', status = 'all', keyword = '', page = 
 function loadNews(category = 'all', keyword = '', page = 1, pageSize = 9) {
     const grid = document.getElementById('newsListGrid');
     if (!grid) return;
+    
+    // 确保数据已加载
+    if (!news || news.length === 0) {
+        grid.innerHTML = '<p style="text-align:center;padding:40px;color:#999;">暂无新闻</p>';
+        // 尝试重新加载数据
+        if (typeof loadData === 'function') {
+            loadData().then(() => loadNews(category, keyword, page, pageSize));
+        }
+        return;
+    }
     
     let filtered = [...news];
     

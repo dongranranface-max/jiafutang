@@ -3,8 +3,8 @@
 <head><title>添加新闻</title></head>
 <body>
 <h2>正在添加新闻...</h2>
+<script src="admin/js/api.js"></script>
 <script>
-const API = 'https://jiafutang-api.dongranranface.workers.dev/api/news';
 const newsList = [
     {title:'2026年春季艺术品拍卖市场分析',category:'industry',cover_image:'https://images.unsplash.com/photo-1578926288207-a90a5366759d?w=400',summary:'春季拍卖成绩单出炉，书画板块表现亮眼瓷器杂项热度上升',is_top:true,sort:1},
     {title:'古董瓷器成投资新宠 宋代瓷器成交创新高',category:'industry',cover_image:'https://images.unsplash.com/photo-1565193566173-7a0ee3dbe261?w=400',summary:'宋代五大名窑瓷器市场行情持续上涨，成为投资热点',is_top:false,sort:2},
@@ -19,12 +19,8 @@ const newsList = [
 async function addNews() {
     for (const n of newsList) {
         try {
-            const res = await fetch(API, {
-                method: 'POST',
-                headers: {'Content-Type':'application/json'},
-                body: JSON.stringify(n)
-            });
-            console.log(n.title, await res.json());
+            const result = await createNews(n);
+            console.log(n.title, result);
         } catch(e) {
             console.error(n.title, e);
         }

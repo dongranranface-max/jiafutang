@@ -193,6 +193,7 @@
         </div>
     </div>
 
+    <script src="../js/api.js"></script>
     <script>
     const STORAGE_KEY = 'jiafutang_submissions';
     let submissions = [];
@@ -205,18 +206,36 @@
     function init() { loadSubmissions(); }
 
     // 加载数据
-    function loadSubmissions() {
-        const stored = localStorage.getItem(STORAGE_KEY);
-        if (stored) {
-            submissions = JSON.parse(stored);
-        } else {
-            submissions = [
-                {id:1,itemName:'清代瓷器花瓶',itemCategory:'antique',itemDesc:'清代晚期青花瓷',contactName:'张三',contactMobile:'13800138000',contactWechat:'zhangsan',city:'北京',createdAt:'2026-02-17T10:30:00',handleStatus:'pending'},
-                {id:2,itemName:'齐白石画作',itemCategory:'art',itemDesc:'名家字画',contactName:'李四',contactMobile:'13900139000',city:'上海',createdAt:'2026-02-16T15:20:00',handleStatus:'processed'},
-                {id:3,itemName:'翡翠手镯',itemCategory:'jewelry',itemDesc:'玻璃种翡翠',contactName:'王五',contactWechat:'wangwu',city:'广州',createdAt:'2026-02-15T09:00:00',handleStatus:'pending'}
-            ];
+    async function loadSubmissions() {
+        try {
+            // 优先从API获取，如果没有数据则用本地示例
+            const data = await getSubmissions();
+            if (data && data.length > 0) {
+                submissions = data;
+                localStorage.setItem(STORAGE_KEY, JSON.stringify(submissions));
+            } else {
+                // 用本地数据
+                const stored = localStorage.getItem(STORAGE_KEY);
+                submissions = stored ? JSON.parse(stored) : getDefaultSubmissions();
+                saveToStorage();
+            }
+        } catch(e) {
+            console.error('加载失败，使用本地数据:', e);
+            const stored = localStorage.getItem(STORAGE_KEY);
+            submissions = stored ? JSON.parse(stored) : getDefaultSubmissions();
             saveToStorage();
         }
+        renderStats();
+        renderTable();
+    }
+    
+    function getDefaultSubmissions() {
+        return [
+            {id:1,itemName:'清代瓷器花瓶',itemCategory:'antique',itemDesc:'清代晚期青花瓷',contactName:'张三',contactMobile:'13800138000',contactWechat:'zhangsan',city:'北京',createdAt:'2026-02-17T10:30:00',handleStatus:'pending'},
+            {id:2,itemName:'齐白石画作',itemCategory:'art',itemDesc:'名家字画',contactName:'李四',contactMobile:'13900139000',city:'上海',createdAt:'2026-02-16T15:20:00',handleStatus:'processed'},
+            {id:3,itemName:'翡翠手镯',itemCategory:'jewelry',itemDesc:'玻璃种翡翠',contactName:'王五',contactWechat:'wangwu',city:'广州',createdAt:'2026-02-15T09:00:00',handleStatus:'pending'}
+        ];
+    }
         renderStats();
         renderTable();
     }
