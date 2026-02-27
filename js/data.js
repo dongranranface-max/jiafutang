@@ -23,23 +23,54 @@ const NEWS_CATEGORIES = {
 
 // ============ 数据加载 ============
 async function loadData() {
+    console.log('[jiafutang] 开始加载数据...');
+    
+    // 先初始化基础功能（汉堡菜单等）
+    initFilters();
+    initHeader();
+    initHeroSlider();
+    
     try {
+        const apiUrl = API_URL + '/api/collections';
+        console.log('[jiafutang] 请求 URL:', apiUrl);
+        
         const [cRes, nRes] = await Promise.all([
             fetch(API_URL + '/api/collections'),
             fetch(API_URL + '/api/news')
         ]);
-        collections = await cRes.json();
-        news = await nRes.json();
+        
+        console.log('[jiafutang] 响应状态:', cRes.status, nRes.status);
+        
+        // 即使 API 失败也继续，只是显示空数据
+        if (cRes.ok) {
+            collections = await cRes.json();
+        } else {
+            console.warn('[jiafutang] 藏品 API 失败');
+            collections = [];
+        }
+        
+        if (nRes.ok) {
+            news = await nRes.json();
+        } else {
+            console.warn('[jiafutang] 新闻 API 失败');
+            news = [];
+        }
+        
+        console.log('[jiafutang] 藏品数量:', collections.length);
+        console.log('[jiafutang] 新闻数量:', news.length);
+        
         renderPage();
-        initFilters();
-        initHeader();
-        initHeroSlider();
+        
         // 首页加载完成后，初始化新闻卡片点击事件
         if (document.getElementById('homeNewsGrid')) {
             initHomeNewsClickEvents();
         }
     } catch(e) {
-        console.error('加载失败:', e);
+        console.error('[jiafutang] 加载失败:', e);
+        // 即使失败也显示空数据，不阻塞页面
+        collections = [];
+        news = [];
+        renderPage();
     }
 }
 
@@ -72,7 +103,11 @@ function renderPage() {
     if (fg) {
         const featured = collections.filter(c => c.is_featured == 1);
         const displayCols = featured.length > 0 ? featured : collections;
-        fg.innerHTML = displayCols.slice(0,4).map(item => createCollectionCard(item, false)).join('');
+        fg.innerHTML = displayCols.slice(0,4).map((item, idx) => {
+            const card = createCollectionCard(item, false);
+            // 直接添加 onclick
+            return card.replace('class="collection-card"', 'class="collection-card" onclick="window.location.href=\'collection-detail.html?id=' + item.id + '\'"');
+        }).join('');
     }
     
     // 首页新闻 - 如果没有 is_featured/is_top 则显示所有
@@ -80,7 +115,11 @@ function renderPage() {
     if (hg) {
         const featuredNews = news.filter(n => n.is_featured == 1 || n.is_top == 1);
         const displayNews = featuredNews.length > 0 ? featuredNews : news;
-        hg.innerHTML = [...displayNews].sort((a,b) => b.sort - a.sort).slice(0,4).map(createNewsCard).join('');
+        hg.innerHTML = [...displayNews].sort((a,b) => b.sort - a.sort).slice(0,4).map((item, idx) => {
+            const card = createNewsCard(item);
+            // 直接添加 onclick
+            return card.replace('class="news-card"', 'class="news-card" onclick="window.location.href=\'news-detail.html?id=' + item.id + '\'"');
+        }).join('');
     }
     
     // 统计数字动画
@@ -111,7 +150,10 @@ function renderCollections() {
     
     filtered.sort((a,b) => b.sort - a.sort);
     cg.style.cssText = 'display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:30px;';
-    cg.innerHTML = filtered.map(item => createCollectionCard(item, true)).join('');
+    cg.innerHTML = filtered.map((item, idx) => {
+        const card = createCollectionCard(item, true);
+        return card.replace('class="collection-card"', 'class="collection-card" onclick="window.location.href=\'collection-detail.html?id=' + item.id + '\'"');
+    }).join('');
 }
 
 // 渲染新闻列表
@@ -128,7 +170,10 @@ function renderNews() {
     
     filtered.sort((a,b) => b.sort - a.sort);
     ng.style.cssText = 'display:grid;grid-template-columns:repeat(auto-fill,minmax(320px,1fr));gap:30px;';
-    ng.innerHTML = filtered.map(createNewsCard).join('');
+    ng.innerHTML = filtered.map((item, idx) => {
+        const card = createNewsCard(item);
+        return card.replace('class="news-card"', 'class="news-card" onclick="window.location.href=\'news-detail.html?id=' + item.id + '\'"');
+    }).join('');
 }
 
 // ============ 组件创建 ============
@@ -142,20 +187,21 @@ function createCollectionCard(item, showStatus = true) {
         '<div style="padding:20px;">' +
         '<h3 style="font-size:18px;margin-bottom:8px;color:#333;">' + item.title + '</h3>' +
         '<p style="font-size:14px;color:#666;">' + COLLECTION_CATEGORIES[item.category] + ' · ' + (item.summary||'').substring(0,15) + '</p>' +
-        '</div></div>';
+        '</a>';
 }
 
 function createNewsCard(item) {
     var newsId = item.id;
-    return '<div class="news-card" id="news-card-' + newsId + '" data-id="' + newsId + '" style="background:#fff;border-radius:12px;overflow:hidden;box-shadow:0 4px 20px rgba(0,0,0,0.08);transition:transform 0.3s;cursor:pointer;">' +
+    var url = 'news-detail.html?id=' + newsId;
+    return '<a href="' + url + '" class="news-card" id="news-card-' + newsId + '" data-id="' + newsId + '" style="display:block;background:#fff;border-radius:12px;overflow:hidden;box-shadow:0 4px 20px rgba(0,0,0,0.08);transition:transform 0.3s;text-decoration:none;color:inherit;">' +
         '<div style="aspect-ratio:16/9;overflow:hidden;">' +
-        '<img src="' + item.cover_image + '" alt="' + item.title + '" style="width:100%;height:100%;object-fit:cover;">' +
+        '<img src="' + (item.cover_image || '') + '" alt="' + (item.title || '') + '" style="width:100%;height:100%;object-fit:cover;">' +
         '</div>' +
         '<div style="padding:20px;">' +
-        '<span style="display:inline-block;padding:4px 12px;background:#f5f5f5;border-radius:4px;font-size:12px;color:#666;margin-bottom:12px;">' + NEWS_CATEGORIES[item.category] + '</span>' +
-        '<h3 style="font-size:18px;margin-bottom:8px;color:#333;line-height:1.4;">' + item.title + '</h3>' +
-        '<p style="font-size:14px;color:#888;line-height:1.6;">' + (item.summary||'') + '</p>' +
-        '</div></div>';
+        '<span style="display:inline-block;padding:4px 12px;background:#f5f5f5;border-radius:4px;font-size:12px;color:#666;margin-bottom:12px;">' + (NEWS_CATEGORIES[item.category] || '') + '</span>' +
+        '<h3 style="font-size:18px;margin-bottom:8px;color:#333;line-height:1.4;">' + (item.title || '') + '</h3>' +
+        '<p style="font-size:14px;color:#888;line-height:1.6;">' + (item.summary || '') + '</p>' +
+        '</a>';
 }
 
 // 为新闻卡片添加点击事件（使用事件委托）
@@ -207,23 +253,46 @@ document.addEventListener('DOMContentLoaded', function() {
 
 // ============ 初始化功能 ============
 function initFilters() {
+    console.log('[jiafutang] 初始化功能...');
+    
     // 移动端菜单
     const hamburger = document.getElementById('hamburger');
     const nav = document.getElementById('nav');
+    const overlay = document.getElementById('navOverlay');
+    
+    console.log('[jiafutang] 汉堡菜单元素:', hamburger, nav);
     
     if (hamburger && nav) {
         hamburger.addEventListener('click', function(e) {
             e.preventDefault();
+            e.stopPropagation();
+            console.log('[jiafutang] 汉堡菜单点击');
             hamburger.classList.toggle('active');
             nav.classList.toggle('active');
+            if (overlay) overlay.classList.toggle('active');
         });
         
+        // 点击遮罩层关闭菜单
+        if (overlay) {
+            overlay.addEventListener('click', function() {
+                hamburger.classList.remove('active');
+                nav.classList.remove('active');
+                overlay.classList.remove('active');
+            });
+        }
+        
+        // 点击导航链接关闭菜单
         nav.querySelectorAll('.nav-link').forEach(link => {
             link.addEventListener('click', function() {
                 hamburger.classList.remove('active');
                 nav.classList.remove('active');
+                if (overlay) overlay.classList.remove('active');
             });
         });
+        
+        console.log('[jiafutang] 汉堡菜单事件已绑定');
+    } else {
+        console.log('[jiafutang] 未找到汉堡菜单元素');
     }
     
     // 藏品分类筛选
