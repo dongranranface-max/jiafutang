@@ -522,8 +522,14 @@
                 }
                 
                 // 获取URL参数中的新闻ID
-                const id = parseInt(getUrlParam('id'));
-                currentNews = news.find(n => n.id === id) || news[0];
+                const id = getUrlParam('id');
+                console.log('[news-detail] URL参数id:', id);
+                console.log('[news-detail] 新闻列表:', news);
+                
+                // 尝试多种方式匹配：数字或字符串
+                currentNews = news.find(n => n.id == id || n.id === id || String(n.id) === id) || news[0];
+                
+                console.log('[news-detail] 匹配的新闻:', currentNews);
                 
                 if (!currentNews) {
                     showError('新闻不存在');
