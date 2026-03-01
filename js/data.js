@@ -239,16 +239,6 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     });
     
-    // 首页新闻卡片点击
-    document.getElementById('homeNewsGrid')?.addEventListener('click', function(e) {
-        var card = e.target.closest('.news-card');
-        if (card) {
-            var newsId = card.dataset.id;
-            if (newsId) {
-                window.location.href = 'news-detail.html?id=' + newsId;
-            }
-        }
-    });
 });
 
 // ============ 初始化功能 ============

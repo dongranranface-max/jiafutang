@@ -10,9 +10,6 @@ const DEFAULT_ADMIN = {
     }
 };
 
-// API 签名密钥 (登录后设置)
-const API_SECRET = 'jiafutang-secret-key-2024';
-
 // 检查登录状态
 function checkAuth() {
     const isLoggedIn = localStorage.getItem('jiafu_admin_logged_in');
@@ -20,9 +17,11 @@ function checkAuth() {
         window.location.href = 'index.html';
     }
     
-    // 检查 API 密钥是否设置
+    // 检查 API 密钥是否设置（优先从 window.ENV 注入）
     if (isLoggedIn && !localStorage.getItem('jiafu_api_secret')) {
-        localStorage.setItem('jiafu_api_secret', API_SECRET);
+        if (window.ENV && window.ENV.API_SECRET) {
+            localStorage.setItem('jiafu_api_secret', window.ENV.API_SECRET);
+        }
     }
 }
 
@@ -38,8 +37,21 @@ document.getElementById('loginForm')?.addEventListener('submit', function(e) {
         // 登录成功
         localStorage.setItem('jiafu_admin_logged_in', 'true');
         localStorage.setItem('jiafu_admin_user', username);
-        // 设置 API 签名密钥
-        localStorage.setItem('jiafu_api_secret', API_SECRET);
+        
+        // 设置 API 签名密钥：
+        // 1) 优先使用后端注入的 window.ENV.API_SECRET
+        // 2) 如果没有注入，则提示管理员手动输入（仅用于管理后台，不在源码中硬编码密钥）
+        let apiSecret = localStorage.getItem('jiafu_api_secret');
+        if (!apiSecret) {
+            if (window.ENV && window.ENV.API_SECRET) {
+                apiSecret = window.ENV.API_SECRET;
+            } else {
+                apiSecret = window.prompt('请输入后台 API 密钥（可向技术人员索取）：') || '';
+            }
+        }
+        if (apiSecret) {
+            localStorage.setItem('jiafu_api_secret', apiSecret);
+        }
         // 设置会话过期时间 (24小时)
         localStorage.setItem('jiafu_session_expires', Date.now() + 24 * 60 * 60 * 1000);
         window.location.href = 'dashboard.html';

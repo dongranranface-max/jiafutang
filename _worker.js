@@ -1,8 +1,11 @@
 // 嘉孚堂 API - 简化版
 // 静态文件由 Cloudflare Pages 自动处理
 
-// API 签名密钥 - 生产环境应使用 env.API_SECRET
-const API_SECRET = 'jiafutang-secret-key-2024';
+// API 签名密钥
+// 说明：
+// - 生产环境：请在 Cloudflare Workers 中配置 env.API_SECRET
+// - 本地/开发环境：可使用 DEV_API_SECRET 作为临时密钥（不要在生产中使用）
+const DEV_API_SECRET = 'jiafutang-secret-key-2024';
 
 export default {
   async fetch(request, env) {
@@ -58,7 +61,9 @@ export default {
         // 计算签名
         const message = `${method}:${path}:${timestamp}:${body}`;
         const encoder = new TextEncoder();
-        const keyData = encoder.encode(API_SECRET);
+        const secret = (env && env.API_SECRET) || DEV_API_SECRET;
+        if (!secret) return false;
+        const keyData = encoder.encode(secret);
         const messageData = encoder.encode(message);
         
         const cryptoKey = await crypto.subtle.importKey(

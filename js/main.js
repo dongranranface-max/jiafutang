@@ -49,8 +49,9 @@ document.addEventListener('DOMContentLoaded', function() {
     initSearch();
     initStatsAnimation();
     
-    // 只初始化表单，不加载数据（数据由 data.js 负责）
-    if (document.getElementById('submissionForm')) {
+    // 只在使用旧版表单布局的页面初始化提交表单
+    // 避免与 submission.html 上的快速表单脚本冲突
+    if (document.getElementById('submissionForm') && document.querySelector('.form-container')) {
         initSubmissionForm();
     }
 });
@@ -352,16 +353,17 @@ function createCollectionCard(item) {
 }
 
 // ===================================
-// 创建新闻卡片 HTML
+// 创建新闻卡片 HTML（使用a标签确保可点击）
 // ===================================
 function createNewsCard(item) {
     const categoryText = NEWS_CATEGORIES[item.category];
     const coverImage = item.cover_image || item.coverImage || '';
     const publishDate = item.publish_date || item.publishAt || item.created_at || new Date().toISOString();
     const date = new Date(publishDate).toLocaleDateString('zh-CN');
+    const url = 'news-detail.html?id=' + item.id;
     
     return `
-        <div class="news-card fade-in">
+        <a href="${url}" class="news-card fade-in" data-id="${item.id}">
             <div class="news-image">
                 <img src="${coverImage}" alt="${item.title}" loading="lazy">
             </div>
@@ -371,7 +373,7 @@ function createNewsCard(item) {
                 <p class="news-summary">${item.summary || ''}</p>
                 <span class="news-date">${date}</span>
             </div>
-        </div>
+        </a>
     `;
 }
 
@@ -652,6 +654,9 @@ function initSubmissionForm() {
     const form = document.getElementById('submissionForm');
     if (!form) return;
     
+    const formContainer = document.querySelector('.form-container');
+    if (!formContainer) return;
+    
     const submitBtn = form.querySelector('.form-submit .btn');
     const fileInput = form.querySelector('#itemImages');
     const previewContainer = form.querySelector('.image-preview');
@@ -747,7 +752,6 @@ function initSubmissionForm() {
         
         // 显示成功提示
         setTimeout(function() {
-            const formContainer = document.querySelector('.form-container');
             formContainer.innerHTML = `
                 <div class="form-success">
                     <div class="form-success-icon">✅</div>
