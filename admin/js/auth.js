@@ -10,18 +10,28 @@ const DEFAULT_ADMIN = {
     }
 };
 
-// 检查登录状态
+// 检查登录状态 - 添加防重复检查
+let authCheckDone = false;
+
 function checkAuth() {
+    // 防止重复检查
+    if (authCheckDone) return;
+    authCheckDone = true;
+    
     const isLoggedIn = localStorage.getItem('jiafu_admin_logged_in');
-    if (!isLoggedIn && window.location.pathname !== '/admin/index.html') {
+    const currentPath = window.location.pathname;
+    
+    // 如果未登录且不在登录页，跳转到登录页
+    if (!isLoggedIn && !currentPath.endsWith('/admin/index.html') && !currentPath.endsWith('index.html')) {
         window.location.href = 'index.html';
+        return;
     }
     
-    // 检查 API 密钥是否设置（优先从 window.ENV 注入）
-    if (isLoggedIn && !localStorage.getItem('jiafu_api_secret')) {
-        if (window.ENV && window.ENV.API_SECRET) {
-            localStorage.setItem('jiafu_api_secret', window.ENV.API_SECRET);
-        }
+    // 检查会话过期
+    const expires = localStorage.getItem('jiafu_session_expires');
+    if (isLoggedIn && expires && Date.now() > parseInt(expires)) {
+        logout();
+        return;
     }
 }
 
@@ -34,41 +44,18 @@ document.getElementById('loginForm')?.addEventListener('submit', function(e) {
     const correctPassword = DEFAULT_ADMIN.getPassword();
     
     if (username === DEFAULT_ADMIN.username && password === correctPassword) {
-        // 登录成功
         localStorage.setItem('jiafu_admin_logged_in', 'true');
         localStorage.setItem('jiafu_admin_user', username);
-        
-        // 设置 API 签名密钥：
-        // 1) 优先使用后端注入的 window.ENV.API_SECRET
-        // 2) 如果没有注入，则提示管理员手动输入（仅用于管理后台，不在源码中硬编码密钥）
-        let apiSecret = localStorage.getItem('jiafu_api_secret');
-        if (!apiSecret) {
-            if (window.ENV && window.ENV.API_SECRET) {
-                apiSecret = window.ENV.API_SECRET;
-            } else {
-                apiSecret = window.prompt('请输入后台 API 密钥（可向技术人员索取）：') || '';
-            }
-        }
-        if (apiSecret) {
-            localStorage.setItem('jiafu_api_secret', apiSecret);
-        }
-        // 设置会话过期时间 (24小时)
         localStorage.setItem('jiafu_session_expires', Date.now() + 24 * 60 * 60 * 1000);
+        
+        // 使用默认 API 密钥
+        localStorage.setItem('jiafu_api_secret', 'jiafutang-secret-key-2024');
+        
         window.location.href = 'dashboard.html';
     } else {
         alert('用户名或密码错误');
     }
 });
-
-// 检查会话是否过期
-function checkSession() {
-    const expires = localStorage.getItem('jiafu_session_expires');
-    if (expires && Date.now() > parseInt(expires)) {
-        logout();
-        return false;
-    }
-    return true;
-}
 
 // 登出
 function logout() {
