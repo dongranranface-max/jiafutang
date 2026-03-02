@@ -160,7 +160,11 @@
     </div>
 
     <script src="js/api.js"></script>
+    <script src="js/auth.js"></script>
     <script>
+    // 先检查登录
+    checkAuth();
+    
     let stats = { collections: 0, news: 0, submissions: 0, sold: 0 };
 
     // 初始化
