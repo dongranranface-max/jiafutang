@@ -326,7 +326,8 @@
                 try {
                     const formData = new FormData();
                     formData.append('file', e.target.result);
-                    formData.append('upload_preset', 'ml_default');
+                    // 使用与前台一致的 preset
+                    formData.append('upload_preset', 'jiafutang');
                     
                     const res = await fetch('https://api.cloudinary.com/v1_1/dongranranface/image/upload', {method: 'POST', body: formData});
                     const data = await res.json();

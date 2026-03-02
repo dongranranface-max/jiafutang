@@ -113,73 +113,7 @@
         </div>
     </footer>
 
-    </footer>
-
     <script src="js/data.js"></script>
     <script src="js/main.js"></script>
-    
-    <script>
-        // 新闻列表点击事件绑定
-        document.addEventListener('DOMContentLoaded', function() {
-            // 新闻列表点击事件
-            const newsGrid = document.getElementById('newsListGrid');
-            if (newsGrid) {
-                // 等待数据加载完成
-                setTimeout(function() {
-                    const cards = newsGrid.querySelectorAll('.news-card');
-                    cards.forEach(function(card, index) {
-                        // 避免重复绑定
-                        if (card.dataset.clickBound) return;
-                        card.dataset.clickBound = 'true';
-                        
-                        card.style.cursor = 'pointer';
-                        card.addEventListener('click', function() {
-                            // 从newsData全局变量或card的data-id获取新闻ID
-                            var newsId = card.dataset.id || (window.newsData ? window.newsData[index]?.id : null);
-                            if (newsId) {
-                                window.location.href = 'news-detail.html?id=' + newsId;
-                            }
-                        });
-                    });
-                }, 500);
-            }
-            
-            // 搜索功能绑定
-            const searchInput = document.getElementById('newsSearchInput');
-            const searchBtn = document.getElementById('newsSearchBtn');
-            
-            if (searchBtn) {
-                searchBtn.addEventListener('click', function() {
-                    var keyword = searchInput.value.trim();
-                    if (keyword) {
-                        // 触发搜索功能
-                        var event = new CustomEvent('searchNews', {detail: keyword});
-                        document.dispatchEvent(event);
-                    }
-                });
-            }
-            
-            if (searchInput) {
-                searchInput.addEventListener('keypress', function(e) {
-                    if (e.key === 'Enter') {
-                        searchBtn.click();
-                    }
-                });
-            }
-            
-            // 筛选功能
-            var filterBtns = document.querySelectorAll('.filter-btn');
-            filterBtns.forEach(function(btn) {
-                btn.addEventListener('click', function() {
-                    filterBtns.forEach(function(b) { b.classList.remove('active'); });
-                    btn.classList.add('active');
-                    var category = btn.dataset.category;
-                    // 触发筛选
-                    var event = new CustomEvent('filterNews', {detail: category});
-                    document.dispatchEvent(event);
-                });
-            });
-        });
-    </script>
 </body>
 </html>

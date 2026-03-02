@@ -188,8 +188,8 @@
             // 新闻统计
             stats.news = news.length;
             
-            // 提交记录（从localStorage）
-            const submissions = JSON.parse(localStorage.getItem('jiafu_submissions') || '[]');
+            // 提交记录（从本地存储，与前台提交表单统一）
+            const submissions = JSON.parse(localStorage.getItem('jiafutang_submissions') || '[]');
             stats.submissions = submissions.length || 0;
             
             // 渲染
