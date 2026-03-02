@@ -75,11 +75,18 @@ export default {
         return signature === expected;
     };
     
-    // 需要签名的 API 列表
-    const signedPaths = ['/api/backup', '/api/backup/restore'];
-    const needsSignature = signedPaths.some(p => path.startsWith(p)) && method !== 'GET';
+    // 需要签名的 API 列表（所有非 GET 写操作）
+    const signedPaths = ['/api/collections', '/api/news', '/api/submissions', '/api/backup'];
+    const needsSignature = method !== 'GET' && signedPaths.some(p => path.startsWith(p));
     
-    if (needsSignature && !await verifySignature()) {
+    // 有请求体时需用 body 参与签名验证（克隆请求读取 body，避免消费原 body）
+    let signatureBody = '';
+    if (needsSignature && (method === 'POST' || method === 'PUT')) {
+        try {
+            signatureBody = await request.clone().text();
+        } catch (_) {}
+    }
+    if (needsSignature && !await verifySignature(signatureBody)) {
         return new Response(JSON.stringify({ error: '签名验证失败' }), { 
             status: 401, 
             headers: { ...corsHeaders, 'Content-Type': 'application/json' } 

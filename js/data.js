@@ -87,7 +87,7 @@ function initHomeNewsClickEvents() {
             card.dataset.clickBound = 'true';
             
             card.addEventListener('click', function() {
-                const id = news[index]?.id || news[index]?.id;
+                const id = news[index]?.id;
                 if (id) {
                     window.location.href = `news-detail.html?id=${id}`;
                 }
@@ -187,7 +187,7 @@ function createCollectionCard(item, showStatus = true) {
         '<div style="padding:20px;">' +
         '<h3 style="font-size:18px;margin-bottom:8px;color:#333;">' + item.title + '</h3>' +
         '<p style="font-size:14px;color:#666;">' + COLLECTION_CATEGORIES[item.category] + ' · ' + (item.summary||'').substring(0,15) + '</p>' +
-        '</a>';
+        '</div>';
 }
 
 function createNewsCard(item) {
