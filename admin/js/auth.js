@@ -70,6 +70,3 @@ function logout() {
 function getCurrentUser() {
     return localStorage.getItem('jiafu_admin_user') || 'admin';
 }
-
-// 初始化时检查会话
-checkAuth();
