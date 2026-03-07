@@ -731,8 +731,8 @@ function initSubmissionForm() {
         });
     }
     
-    // 表单提交 - 保存到localStorage
-    form.addEventListener('submit', function(e) {
+    // 表单提交 - 发送到API
+    form.addEventListener('submit', async function(e) {
         e.preventDefault();
         
         // 验证
@@ -745,24 +745,35 @@ function initSubmissionForm() {
         submitBtn.textContent = '提交中...';
         
         // 收集表单数据
-        const submission = {
-            id: Date.now(),
+        const submissionData = {
             item_name: form.querySelector('#itemName')?.value || '',
             category: form.querySelector('#itemCategory')?.value || '',
-            estimated_value: form.querySelector('#estimatedValue')?.value || '',
             description: form.querySelector('#itemDescription')?.value || '',
             contact_name: form.querySelector('#contactName')?.value || '',
-            contact_mobile: form.querySelector('#contactMobile')?.value || '',
-            contact_city: form.querySelector('#contactCity')?.value || '',
-            images: uploadedImages,
-            status: 'pending',
-            created_at: new Date().toISOString()
+            contact_phone: form.querySelector('#contactMobile')?.value || '',
+            contact_email: form.querySelector('#contactEmail')?.value || ''
         };
         
-        // 保存到localStorage
-        const submissions = JSON.parse(localStorage.getItem('jiafu_submissions') || '[]');
-        submissions.unshift(submission);
-        localStorage.setItem('jiafu_submissions', JSON.stringify(submissions));
+        try {
+            // 发送到API
+            const API_URL = 'https://jiafutang.dongranranface.workers.dev';
+            const response = await fetch(API_URL + '/api/submissions', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(submissionData)
+            });
+            
+            if (!response.ok) {
+                throw new Error('提交失败');
+            }
+            
+            const result = await response.json();
+            console.log('提交成功:', result);
+        } catch (error) {
+            console.error('提交失败:', error);
+        }
         
         // 显示成功提示
         setTimeout(function() {

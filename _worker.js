@@ -133,8 +133,19 @@ export default {
       }
       
       if (path === '/api/submissions') {
+        // GET - 获取提交列表
         const { results } = await env.jiafutang_db.prepare('SELECT * FROM submissions ORDER BY created_at DESC').all();
         return new Response(JSON.stringify(results || []), { headers: { ...corsHeaders, 'Content-Type': 'application/json' } });
+      }
+      
+      // 提交藏品 (POST)
+      if (path === '/api/submissions' && method === 'POST') {
+        const data = await request.json();
+        const result = await env.jiafutang_db.prepare(
+          'INSERT INTO submissions (item_name, category, description, contact_name, contact_phone, contact_email, status) VALUES (?, ?, ?, ?, ?, ?, ?)'
+        ).bind(data.item_name, data.category, data.description, data.contact_name, data.contact_phone, data.contact_email, 'pending').run();
+        await logOp('create_submission', result.lastRowId?.toString(), { item_name: data.item_name });
+        return new Response(JSON.stringify({ success: true, id: result.lastRowId }), { headers: corsHeaders });
       }
       
       if (path === '/api/logs') {
