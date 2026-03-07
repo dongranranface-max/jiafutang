@@ -3,8 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>藏品详情 - 嘉孚堂</title>
-    <meta name="description" content="嘉孚堂藏品详情">
+    <title>藏品详情 - 嘉孚�?/title>
+    <meta name="description" content="嘉孚堂藏品详�?>
     <link rel="stylesheet" href="css/style.css">
     <link rel="icon" type="image/x-icon" href="favicon.ico">
     <link rel="apple-touch-icon" href="favicon.ico">
@@ -15,13 +15,13 @@
     <header class="header scrolled" id="header">
         <div class="container header-inner">
             <a href="index.html" class="logo">
-                <img src="images/logo.png" alt="嘉孚堂" class="logo-img">
+                <img src="images/logo.png" alt="嘉孚�? class="logo-img">
             </a>
             <nav class="nav" id="nav">
                 <a href="index.html" class="nav-link">首页</a>
                 <a href="collections.html" class="nav-link active">藏品展示</a>
                 <a href="consignment.html" class="nav-link">征集流程</a>
-                <a href="news.html" class="nav-link">新闻动态</a>
+                <a href="news.html" class="nav-link">新闻动�?/a>
                 <a href="about.html" class="nav-link">关于我们</a>
             </nav>
             <button class="hamburger" id="hamburger" aria-label="菜单">
@@ -36,23 +36,23 @@
     <!-- Collection Detail -->
     <section class="collection-detail">
         <div class="container">
-            <a href="collections.html" class="news-back">← 返回藏品列表</a>
+            <a href="collections.html" class="news-back">�?返回藏品列表</a>
             
             <div class="collection-detail-grid">
                 <div class="collection-detail-gallery">
                     <img class="collection-main-image" id="collectionMainImage" src="" alt="藏品图片">
                     <div class="collection-thumbnails" id="collectionThumbs">
-                        <!-- 缩略图将通过JS动态生成 -->
+                        <!-- 缩略图将通过JS动态生�?-->
                     </div>
                 </div>
                 
                 <div class="collection-detail-info">
                     <h1 id="collectionTitle">藏品标题</h1>
-                    <span class="collection-detail-status" id="collectionStatus">已拍卖</span>
+                    <span class="collection-detail-status" id="collectionStatus">已拍�?/span>
                     
                     <div class="collection-detail-meta">
-                        <span>品类：<strong id="collectionCategory">艺术品</strong></span>
-                        <span>编号：<strong id="collectionId">001</strong></span>
+                        <span>品类�?strong id="collectionCategory">艺术�?/strong></span>
+                        <span>编号�?strong id="collectionId">001</strong></span>
                     </div>
                     
                     <p class="collection-detail-desc" id="collectionDesc">
@@ -70,7 +70,7 @@
             <div class="collection-related">
                 <h2>相关推荐</h2>
                 <div class="featured-grid" id="relatedGrid">
-                    <!-- 相关藏品将通过JS动态生成 -->
+                    <!-- 相关藏品将通过JS动态生�?-->
                 </div>
             </div>
         </div>
@@ -81,24 +81,24 @@
         <div class="container">
             <div class="footer-content">
                 <div class="footer-brand">
-                    <h3 class="footer-logo"><img src="images/logo.png" alt="嘉孚堂" class="footer-logo-img"></h3>
-                    <p class="footer-tagline">让珍宝遇见知己</p>
+                    <h3 class="footer-logo"><img src="images/logo.png" alt="嘉孚�? class="footer-logo-img"></h3>
+                    <p class="footer-tagline">让珍宝遇见知�?/p>
                 </div>
                 <div class="footer-contact">
                     <h4 class="footer-title">联系我们</h4>
-                    <p class="footer-item">📞 电话：400-888-8888</p>
-                    <p class="footer-item">📧 邮箱：service@jiafutang.com</p>
-                    <p class="footer-item">📍 地址：海南省海口区龙华富豪花园16号</p>
+                    <p class="footer-item">📞 电话�?00-888-8888</p>
+                    <p class="footer-item">📧 邮箱：jiafutang@jiafutangbid.cn</p>
+                    <p class="footer-item">📍 地址：海南省海口区龙华富豪花�?6�?/p>
                 </div>
                 <div class="footer-links">
-                    <h4 class="footer-title">快速链接</h4>
+                    <h4 class="footer-title">快速链�?/h4>
                     <a href="collections.html">藏品展示</a>
                     <a href="consignment.html">征集流程</a>
                     <a href="about.html">关于我们</a>
                 </div>
             </div>
             <div class="footer-bottom">
-                <p>&copy; 2026 嘉孚堂 版权所有</p>
+                <p>&copy; 2026 嘉孚�?版权所�?/p>
             </div>
         </div>
     </footer>
@@ -139,17 +139,17 @@
             document.getElementById('collectionMainImage').src = item.cover_image || item.coverImage;
             document.getElementById('collectionTitle').textContent = item.title;
             
-            // 状态
+            // 状�?
             const statusEl = document.getElementById('collectionStatus');
             statusEl.textContent = COLLECTION_STATUS[item.status];
             statusEl.className = 'collection-detail-status ' + item.status;
             
-            // 元信息
+            // 元信�?
             document.getElementById('collectionCategory').textContent = COLLECTION_CATEGORIES[item.category];
             document.getElementById('collectionId').textContent = String(item.id).padStart(3, '0');
             document.getElementById('collectionDesc').textContent = item.summary || item.content || '';
             
-            // 缩略图 - 使用 cover_image
+            // 缩略�?- 使用 cover_image
             const thumbsContainer = document.getElementById('collectionThumbs');
             const coverImg = item.cover_image || item.coverImage;
             thumbsContainer.innerHTML = `
@@ -158,7 +158,7 @@
                 </div>
             `;
             
-            // 缩略图点击切换
+            // 缩略图点击切�?
             thumbsContainer.querySelectorAll('.collection-thumb').forEach(thumb => {
                 thumb.addEventListener('click', function() {
                     const index = this.dataset.index;
