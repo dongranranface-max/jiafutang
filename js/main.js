@@ -35,10 +35,18 @@
         
         // 点击导航链接关闭菜单
         nav.querySelectorAll('.nav-link').forEach(link => {
-            link.addEventListener('click', function() {
+            link.addEventListener('click', function(e) {
+                e.preventDefault();
+                e.stopPropagation();
+                // 执行导航
+                const href = this.getAttribute('href');
                 hamburger.classList.remove('active');
                 nav.classList.remove('active');
                 if (overlay) overlay.classList.remove('active');
+                // 延迟跳转，让动画完成
+                setTimeout(function() {
+                    window.location.href = href;
+                }, 300);
             });
         });
         
