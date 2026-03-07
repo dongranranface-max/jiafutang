@@ -353,6 +353,7 @@ input, textarea, select {
         transition: all 0.35s;
     }
     .nav-overlay.active { opacity: 1; visibility: visible; }
+    .nav-overlay.active { opacity: 1; visibility: visible; }
     
     /* Hero */
     .hero { min-height: 500px; height: auto; padding: 100px 20px 60px; }
