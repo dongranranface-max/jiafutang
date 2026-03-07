@@ -12,6 +12,7 @@
         if (hamburger.dataset.initialized) return;
         hamburger.dataset.initialized = 'true';
         
+        // 点击事件
         hamburger.addEventListener('click', function(e) {
             e.preventDefault();
             e.stopPropagation();
@@ -21,6 +22,15 @@
             const overlay = document.getElementById('navOverlay');
             if (overlay) overlay.classList.toggle('active');
         });
+        
+        // 触摸事件（确保移动端响应）
+        hamburger.addEventListener('touchstart', function(e) {
+            e.preventDefault();
+            hamburger.classList.toggle('active');
+            nav.classList.toggle('active');
+            const overlay = document.getElementById('navOverlay');
+            if (overlay) overlay.classList.toggle('active');
+        }, { passive: false });
         
         // 点击遮罩层关闭菜单
         const overlay = document.getElementById('navOverlay');
@@ -53,6 +63,19 @@
         console.log('Mobile menu initialized');
     }
 })();
+
+// 备用菜单切换函数（内联调用）
+function toggleMenu() {
+    const hamburger = document.getElementById('hamburger');
+    const nav = document.getElementById('nav');
+    const overlay = document.getElementById('navOverlay');
+    
+    if (hamburger && nav) {
+        hamburger.classList.toggle('active');
+        nav.classList.toggle('active');
+        if (overlay) overlay.classList.toggle('active');
+    }
+}
 
 document.addEventListener('DOMContentLoaded', function() {
     // 基础功能初始化
