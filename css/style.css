@@ -423,6 +423,7 @@ input, textarea, select {
         /* 隐藏滚动条但保持功能 */
         scrollbar-width: none;
         -ms-overflow-style: none;
+        min-height: 200px; /* 确保有内容时显示 */
     }
     .featured-grid::-webkit-scrollbar, .news-grid::-webkit-scrollbar { 
         display: none; 
@@ -430,6 +431,7 @@ input, textarea, select {
     .featured-grid > *, .news-grid > * { 
         flex: 0 0 80%; 
         scroll-snap-align: start; 
+        min-width: 250px; /* 确保内容显示 */
     }
     .card-image { height: 180px; }
     .news-image { height: 140px; }
@@ -444,10 +446,17 @@ input, textarea, select {
         grid-template-columns: repeat(2, 1fr) !important;
         gap: 12px !important;
         overflow-x: visible !important;
+        min-height: 200px;
     }
     #collectionGrid .collection-card, #newsListGrid .news-card {
         flex: none !important;
         width: 100% !important;
+        min-width: 0 !important;
+    }
+    /* 确保卡片内容可见 */
+    #collectionGrid .card-info, #newsListGrid .news-content {
+        visibility: visible !important;
+        opacity: 1 !important;
     }
     
     /* Process */
