@@ -23,41 +23,39 @@ const NEWS_CATEGORIES = {
 
 // ============ 数据加载 ============
 async function loadData() {
-    console.log('[jiafutang] 开始加载数据...');
+    // 显示加载状态
+    const featuredGrid = document.getElementById('featuredGrid');
+    const homeNewsGrid = document.getElementById('homeNewsGrid');
+    const collectionGrid = document.getElementById('collectionGrid');
+    const newsListGrid = document.getElementById('newsListGrid');
+    
+    if (featuredGrid) featuredGrid.innerHTML = '<p style="text-align:center;padding:40px;color:#999;">加载中...</p>';
+    if (homeNewsGrid) homeNewsGrid.innerHTML = '<p style="text-align:center;padding:40px;color:#999;">加载中...</p>';
+    if (collectionGrid) collectionGrid.innerHTML = '<p style="text-align:center;padding:40px;color:#999;">加载中...</p>';
+    if (newsListGrid) newsListGrid.innerHTML = '<p style="text-align:center;padding:40px;color:#999;">加载中...</p>';
     
     // 先初始化基础功能（汉堡菜单等）
-    initFilters();
-    initHeader();
-    initHeroSlider();
+    if (typeof initFilters === 'function') initFilters();
+    if (typeof initHeader === 'function') initHeader();
+    if (typeof initHeroSlider === 'function') initHeroSlider();
     
     try {
-        const apiUrl = API_URL + '/api/collections';
-        console.log('[jiafutang] 请求 URL:', apiUrl);
-        
         const [cRes, nRes] = await Promise.all([
             fetch(API_URL + '/api/collections'),
             fetch(API_URL + '/api/news')
         ]);
         
-        console.log('[jiafutang] 响应状态:', cRes.status, nRes.status);
-        
-        // 即使 API 失败也继续，只是显示空数据
         if (cRes.ok) {
             collections = await cRes.json();
         } else {
-            console.warn('[jiafutang] 藏品 API 失败');
             collections = [];
         }
         
         if (nRes.ok) {
             news = await nRes.json();
         } else {
-            console.warn('[jiafutang] 新闻 API 失败');
             news = [];
         }
-        
-        console.log('[jiafutang] 藏品数量:', collections.length);
-        console.log('[jiafutang] 新闻数量:', news.length);
         
         renderPage();
         
@@ -66,8 +64,7 @@ async function loadData() {
             initHomeNewsClickEvents();
         }
     } catch(e) {
-        console.error('[jiafutang] 加载失败:', e);
-        // 即使失败也显示空数据，不阻塞页面
+        console.error('加载失败:', e);
         collections = [];
         news = [];
         renderPage();
