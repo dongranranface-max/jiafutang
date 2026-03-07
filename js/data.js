@@ -149,7 +149,7 @@ function renderCollections() {
     if (keyword) filtered = filtered.filter(c => c.title.includes(keyword) || (c.summary && c.summary.includes(keyword)));
     
     filtered.sort((a,b) => b.sort - a.sort);
-    cg.style.cssText = 'display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:30px;';
+    // 不使用内联样式，让 CSS 控制布局
     cg.innerHTML = filtered.map((item, idx) => {
         const card = createCollectionCard(item, true);
         return card.replace('class="collection-card"', 'class="collection-card" onclick="window.location.href=\'collection-detail.html?id=' + item.id + '\'"');
@@ -169,7 +169,7 @@ function renderNews() {
     if (keyword) filtered = filtered.filter(n => n.title.includes(keyword) || (n.summary && n.summary.includes(keyword)));
     
     filtered.sort((a,b) => b.sort - a.sort);
-    ng.style.cssText = 'display:grid;grid-template-columns:repeat(auto-fill,minmax(320px,1fr));gap:30px;';
+    // 不使用内联样式，让 CSS 控制布局
     ng.innerHTML = filtered.map((item, idx) => {
         const card = createNewsCard(item);
         return card.replace('class="news-card"', 'class="news-card" onclick="window.location.href=\'news-detail.html?id=' + item.id + '\'"');

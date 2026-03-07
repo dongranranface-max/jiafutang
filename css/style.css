@@ -437,6 +437,18 @@ input, textarea, select {
     .card-meta, .news-desc { font-size: 12px; }
     .card-status { padding: 4px 10px; font-size: 11px; }
     
+    /* 藏品列表和新闻列表 - 移动端网格布局 */
+    #collectionGrid, #newsListGrid {
+        display: grid !important;
+        grid-template-columns: repeat(2, 1fr) !important;
+        gap: 12px !important;
+        overflow-x: visible !important;
+    }
+    #collectionGrid .collection-card, #newsListGrid .news-card {
+        flex: none !important;
+        width: 100% !important;
+    }
+    
     /* Process */
     .process-section { padding: 40px 0; }
     .process-section p { font-size: 15px; line-height: 1.8; }
