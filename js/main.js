@@ -8,8 +8,13 @@
     const nav = document.getElementById('nav');
     
     if (hamburger && nav) {
+        // 防止重复绑定
+        if (hamburger.dataset.initialized) return;
+        hamburger.dataset.initialized = 'true';
+        
         hamburger.addEventListener('click', function(e) {
             e.preventDefault();
+            e.stopPropagation();
             hamburger.classList.toggle('active');
             nav.classList.toggle('active');
             // 切换遮罩层
@@ -20,7 +25,8 @@
         // 点击遮罩层关闭菜单
         const overlay = document.getElementById('navOverlay');
         if (overlay) {
-            overlay.addEventListener('click', function() {
+            overlay.addEventListener('click', function(e) {
+                e.stopPropagation();
                 hamburger.classList.remove('active');
                 nav.classList.remove('active');
                 overlay.classList.remove('active');
