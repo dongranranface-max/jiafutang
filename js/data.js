@@ -21,6 +21,18 @@ const NEWS_CATEGORIES = {
     all: '全部', brand: '嘉孚堂动态', industry: '行业动态'
 };
 
+// 示例数据 - 用于测试
+const SAMPLE_COLLECTIONS = [
+    { id: 1, title: '抽象数字艺术', category: 'nft', status: 'sold', cover_image: 'https://images.unsplash.com/photo-1634152962476-4b8a00e1915c?w=400', summary: '抽象数字艺术', is_featured: 1, sort: 1 },
+    { id: 2, title: '3D渲染艺术', category: 'nft', status: 'sold', cover_image: 'https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?w=400', summary: '3D渲染艺术', is_featured: 1, sort: 2 },
+    { id: 3, title: '加密艺术', category: 'nft', status: 'coming', cover_image: 'https://images.unsplash.com/photo-1620641788421-7a1c342ea42e?w=400', summary: '加密区块链风格', is_featured: 1, sort: 3 }
+];
+
+const SAMPLE_NEWS = [
+    { id: 1, title: '嘉孚堂首拍圆满成功', category: 'brand', summary: '热烈庆祝嘉孚堂首场拍卖会圆满成功', cover_image: 'https://images.unsplash.com/photo-1561214115-f2f134cc4912?w=400', is_featured: 1, sort: 1 },
+    { id: 2, title: '艺术品市场发展趋势', category: 'industry', summary: '分析2026年艺术品市场发展趋势', cover_image: 'https://images.unsplash.com/photo-1579783902614-a3fb3927b6a5?w=400', is_featured: 1, sort: 2 }
+];
+
 // ============ 数据加载 ============
 async function loadData() {
     // 显示加载状态
@@ -48,13 +60,16 @@ async function loadData() {
         if (cRes.ok) {
             collections = await cRes.json();
         } else {
-            collections = [];
+            // API失败时使用示例数据
+            console.warn('API失败，使用示例数据');
+            collections = SAMPLE_COLLECTIONS;
         }
         
         if (nRes.ok) {
             news = await nRes.json();
         } else {
-            news = [];
+            // API失败时使用示例数据
+            news = SAMPLE_NEWS;
         }
         
         renderPage();
