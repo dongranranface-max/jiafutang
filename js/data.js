@@ -52,10 +52,18 @@ async function loadData() {
     if (typeof initHeroSlider === 'function') initHeroSlider();
     
     try {
+        // 添加超时控制
+        const controller = new AbortController();
+        const timeoutId = setTimeout(() => controller.abort(), 5000);
+        
         const [cRes, nRes] = await Promise.all([
-            fetch(API_URL + '/api/collections'),
-            fetch(API_URL + '/api/news')
-        ]);
+            fetch(API_URL + '/api/collections', { signal: controller.signal }),
+            fetch(API_URL + '/api/news', { signal: controller.signal })
+        ]).catch(e => {
+            clearTimeout(timeoutId);
+            throw e;
+        });
+        clearTimeout(timeoutId);
         
         if (cRes.ok) {
             collections = await cRes.json();
@@ -80,8 +88,9 @@ async function loadData() {
         }
     } catch(e) {
         console.error('加载失败:', e);
-        collections = [];
-        news = [];
+        // 使用示例数据
+        collections = SAMPLE_COLLECTIONS;
+        news = SAMPLE_NEWS;
         renderPage();
     }
 }

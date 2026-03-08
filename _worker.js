@@ -13,7 +13,7 @@ export default {
     const path = url.pathname;
     const method = request.method;
     
-    // CORS headers - 限制允许的域名
+    // CORS headers - 允许所有Cloudflare Pages预览和正式域名
     const corsOrigins = [
         'https://jiafutang.pages.dev',
         'https://jiafutang.dongranranface.workers.dev',
@@ -21,7 +21,9 @@ export default {
         'http://localhost:3000'
     ];
     const requestOrigin = request.headers.get('Origin') || '';
-    const allowedOrigin = corsOrigins.includes(requestOrigin) ? requestOrigin : corsOrigins[0];
+    // 允许所有 jiafutang.pages.dev 的子域名
+    const isAllowed = corsOrigins.includes(requestOrigin) || requestOrigin.endsWith('.jiafutang.pages.dev') || requestOrigin.includes('jiafutang.pages.dev');
+    const allowedOrigin = isAllowed ? requestOrigin : 'https://jiafutang.pages.dev';
     
     const corsHeaders = {
       'Access-Control-Allow-Origin': allowedOrigin,
